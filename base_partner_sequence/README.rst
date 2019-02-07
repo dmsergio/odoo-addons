@@ -51,6 +51,7 @@ Contributors
 * Laurent Mignon (ACSONE) <laurent.mignon@acsone.eu>
 * Guewen Baconnier <guewen.baconnier@camptocamp.com>
 * Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
+* Sergio Díaz <sdimar@yahoo.com>
 
 Maintainer
 ----------

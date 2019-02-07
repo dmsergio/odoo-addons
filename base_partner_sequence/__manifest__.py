@@ -2,9 +2,7 @@
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>).
-#    Copyright (C) 2013 initOS GmbH & Co. KG (<http://www.initos.com>).
-#    Author Thomas Rehn <thomas.rehn at initos.com>
+#    Arthor Sergio Díaz (<sdimar@yahoo.es>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -22,13 +20,17 @@
 ##############################################################################
 {
     "name": "Add a sequence on customers' code",
-    "version": "8.0.1.1.1",
+    "version": "10.0.0.0.1",
     "author": "Tiny/initOS GmbH & Co. KG,"
               "ACSONE SA/NV,"
-              "Odoo Community Association (OCA)",
+              "Odoo Community Association (OCA),"
+              "Sergio Díaz",
     "category": "Generic Modules/Base",
-    "website": "http://www.initos.com",
+    "website": "",
     "summary": "Sets customer's code from a sequence",
+    "depends": [
+        'account'
+    ],
     "data": [
         'data/partner_sequence.xml',
         'views/partner_view.xml',
