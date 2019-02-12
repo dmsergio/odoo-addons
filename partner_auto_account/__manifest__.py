@@ -7,7 +7,7 @@
     'depends': [
         'base',
         'account',
-        # 'base_partner_sequence'
+        'base_partner_sequence'
     ],
     'author': 'sdimar@yahoo.com',
     'website': '',

@@ -14,12 +14,10 @@ class ResPartner(models.Model):
             return
 
         company_id = self.env.user.company_id
-        # self.pool.get('res.users').browse(cr, uid, uid, context).company_id
         parent_account = getattr(company_id, 'parent_%s_account_id' % account_type )
         if not parent_account:
             return
 
-        # partner = self.browse(cr, uid, partner_id, context)
         if account_type == 'receivable':
             checked = partner_id.customer
         else:
@@ -42,10 +40,6 @@ class ResPartner(models.Model):
                     if len(partners) == 1:
                         partner_account.write({'name': partner_id.name})
                         return
-                        # self.pool.get('account.account').write(
-                        #     cr, uid, [partner_account.id], {
-                        #         'name': partner.name,
-                        #     }, context)
 
             # If it's not possible to unlink the account we will rollback this change
             # so the property remains the same. Note that we cannot try to unlink first,
