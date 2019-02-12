@@ -14,7 +14,5 @@ class TestBasePartnerSequence(TransactionCase):
             'name': "test1",
             'email': "test@test.com"})
         self.assertTrue(partner_id.ref, "A partner has always a ref.")
-
-        # copy = partner_id.copy()
-        # self.assertTrue(copy.ref, "A partner with ref created by copy "
-        #                 "has a ref by default.")
+        copy = partner_id.copy()
+        self.assertTrue(copy.ref, "A partner with ref created by copy has a ref by default.")

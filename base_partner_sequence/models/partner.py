@@ -17,10 +17,9 @@ class ResPartner(models.Model):
         """
         Checks whether a sequence value should be assigned to a partner's 'ref'
 
-        :param parnter_id: id of the partner object
+        :param partner_id: res.partner object
         :param values: known field values of the partner object
-        :return: true iff a sequence value should be assigned to the\
-                      partner's 'ref'
+        :return: true if a sequence value should be assigned to the partner's 'ref'
         """
         if not values and not partner_id:
             raise Exception('Either field values or an id must be provided.')
@@ -60,10 +59,9 @@ class ResPartner(models.Model):
             super(ResPartner, partner_id).write(values)
         return True
 
-    # @api.one
-    # def copy(self, default=None):
-    #     default = default or {}
-    #     if self._needsRef(self):
-    #         default.update({
-    #             'ref': self._get_next_ref()})
-    #     return super(ResPartner, self).copy(default)
+    @api.multi
+    def copy(self, values=None):
+        _values = values or {}
+        if self._needsRef(self):
+            _values['ref'] = self._get_next_ref()
+        return super(ResPartner, self).copy(_values)
