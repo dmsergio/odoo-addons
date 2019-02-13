@@ -22,7 +22,7 @@ class ResPartner(models.Model):
             checked = partner_id.customer
         else:
             checked = partner_id.supplier
-        partner_account = getattr(partner_id, 'property_account_%s' % account_type )
+        partner_account = getattr(partner_id, 'property_account_%s_id' % account_type )
 
         if not force_checked is None:
             checked = force_checked
@@ -45,9 +45,9 @@ class ResPartner(models.Model):
             # so the property remains the same. Note that we cannot try to unlink first,
             # because in this case it would always fail because of the fact that it's set
             # as the account in the partner.
-            self.cr.execute('SAVEPOINT remove_account')
+            self.env.cr.execute('SAVEPOINT remove_account')
             self.write({
-                'property_account_%s' % account_type : False})
+                'property_account_%s_id' % account_type : False})
             try:
                 # Unlink may raise an exception if the account is already set in another partner
                 # or if it has account moves.
@@ -55,9 +55,9 @@ class ResPartner(models.Model):
                     partner_account.unlink()
                     # self.pool.get('account.account').unlink(cr, uid, [partner_account.id], context)
             except Exception:
-                self.cr.execute('ROLLBACK TO SAVEPOINT remove_account')
+                self.env.cr.execute('ROLLBACK TO SAVEPOINT remove_account')
 
-            self.cr.execute('RELEASE SAVEPOINT remove_account')
+            self.env.cr.execute('RELEASE SAVEPOINT remove_account')
 
         if not checked:
             return
@@ -77,7 +77,7 @@ class ResPartner(models.Model):
                 'name': partner_id.name,
                 'code': code,
                 'parent_id': parent_account.id,
-                'user_type': parent_account.user_type.id,
+                'user_type_id': parent_account.user_type_id.id,
                 'reconcile': True,
                 'type': account_type})
         self.write({'property_account_%s' % account_type: account_id.id})
