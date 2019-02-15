@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data>
-      <record id="account_move_line_statement_of_accounts_view" model="ir.ui.view">
-          <field name="name">account.move.line.statement_of_accounts</field>
-          <field name="model">account.move.line</field>
-          <field name="priority">30</field>
-          <field name="arch" type="xml">
-              <tree string="Statement of Accounts" version="10" colors="red:full_reconcile_id==False; blue:full_reconcile_id!=False" create="false">
-                  <field name="date"/>
-                  <field name="ref"/>
-                  <field name="invoice_id"/>
-                  <field name="journal_id"/>
-                  <field name="debit" sum="Total debit"/>
-                  <field name="credit" sum="Total credit"/>
-                  <field name="balance"/>
-                  <field name="date_maturity"/>
-                  <field name="full_reconcile_id"/>
-                  <!-- <field name="reconcile_partial_id"/> -->
-                   <!--<field name="state"/>-->
-              </tree>
-          </field>
-    	</record>
+    <record id="account_move_line_statement_of_accounts_view" model="ir.ui.view">
+      <field name="name">account.move.line.statement_of_accounts</field>
+      <field name="model">account.move.line</field>
+      <field name="priority">30</field>
+      <field name="arch" type="xml">
+        <tree string="Statement of Accounts" version="10"
+              colors="red:full_reconcile_id==False; blue:full_reconcile_id!=False" create="false">
+          <field name="date"/>
+          <field name="ref"/>
+          <field name="invoice_id"/>
+          <field name="journal_id"/>
+          <field name="debit" sum="Total debit"/>
+          <field name="credit" sum="Total credit"/>
+          <field name="balance"/>
+          <field name="date_maturity"/>
+          <field name="full_reconcile_id"/>
+        </tree>
+      </field>
+    </record>
   </data>
 </odoo>

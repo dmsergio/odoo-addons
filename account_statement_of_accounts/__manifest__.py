@@ -2,18 +2,16 @@
 {
     "name": "Statment of Accounts",
     "version": "10.0.0.0.1",
-    "author": "Jesus Pablo Ndong Nguema",
+    "author": "Jesus Pablo Ndong Nguema, "
+              "Sergio Díaz Martínez",
     "category": "Accounting",
-    "website": "http://www.nan-tic.com",
+    "website": "",
     "description": """\
         This module adds a new menu entry to show statements of accounts.
 
         Unreconciled account move lines are shown in red and partially
          reconcilled ones are shown in blue.
         """,
-    "contributors": [
-        'Jesus Pablo Ndong',
-        'sdimar@yahoo.es'],
     "depends": [
         'account',
         ],
