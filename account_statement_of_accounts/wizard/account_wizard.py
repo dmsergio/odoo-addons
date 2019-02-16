@@ -8,30 +8,32 @@ class accountStatementAccountsWizard(models.TransientModel):
 
     company_id = fields.Many2one(
         comodel_name='res.company',
-        string='Company', required=True,
+        string='Company',
+        required=True,
         default=lambda self: self._get_default_company())
 
     account_id = fields.Many2one(
         comodel_name='account.account',
-        string='Acount', required=True)
+        string='Acount',
+        required=True)
 
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string='Partner')
 
     date_ini = fields.Date(
-        string='Date Start', required=True)
+        string='Date Start',
+        required=True,
+        default=fields.Date.from_string("{}-01-01".format(datetime.today().year)))
 
     date_end = fields.Date(
-        string='Date End', required=True,
+        string='Date End',
+        required=True,
         default=fields.Date.to_string(datetime.today()))
 
     @api.depends('company_id')
     def _get_default_company(self):
-        user_obj = self.env['res.users']
-        user_id = self._context['uid']
-        user = user_obj.browse(user_id)
-        return user.company_id.id
+        return self.env.user.company_id.id
 
     @api.multi
     def action_open(self):
