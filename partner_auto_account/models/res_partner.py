@@ -66,7 +66,7 @@ class ResPartner(models.Model):
 
         partner_ref = partner_id.ref or ''
         digits = company_id.account_digits or 0
-        code = parent_account.code + '0'*(digits - len(parent_account.code + partner_ref)) + partner_ref
+        code = partner_ref + '0'*(digits - len(parent_account.code + partner_ref)) + parent_account.code
 
         account_obj = self.env['account.account']
         account_id = account_obj.search([('code','=',code)])
@@ -80,7 +80,7 @@ class ResPartner(models.Model):
                 'user_type_id': parent_account.user_type_id.id,
                 'reconcile': True,
                 'type': account_type})
-        self.write({'property_account_%s' % account_type: account_id.id})
+        partner_id.write({'property_account_%s_id' % account_type: account_id.id})
 
     @api.model
     def create(self, values):
