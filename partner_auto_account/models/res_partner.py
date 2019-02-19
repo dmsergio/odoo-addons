@@ -73,11 +73,10 @@ class ResPartner(models.Model):
                 "El número de dígitos de la cuenta padre establecida en la compañía ({0}) es inferior a {1}. Por favor,"
                 " compruebe la configuración de las cuentas en la compañía.".format(parent_code_len, str(digits)))
         code = parent_account.code[:-digits] + partner_ref
-
         account_obj = self.env['account.account']
         account_id = account_obj.search([('code','=',code)])
         if account_id:
-            account_id = account_id[0]
+            raise UserError("Ya existe una cuenta bancaria con el código {0}.".format(code))
         else:
             account_id = account_obj.create({
                 'name': partner_id.name,
