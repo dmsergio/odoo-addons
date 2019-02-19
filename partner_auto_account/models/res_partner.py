@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields, _
+from odoo.exceptions import AccessError, MissingError, ValidationError, UserError
 
 
 class ResPartner(models.Model):
@@ -66,7 +67,12 @@ class ResPartner(models.Model):
 
         partner_ref = partner_id.ref or ''
         digits = company_id.account_digits or 0
-        code = partner_ref + '0'*(digits - len(parent_account.code + partner_ref)) + parent_account.code
+        if len(parent_account.code) < digits:
+            parent_code_len = str(len(parent_account.code))
+            raise UserError(
+                "El número de dígitos de la cuenta padre establecida en la compañía ({0}) es inferior a {1}. Por favor,"
+                " compruebe la configuración de las cuentas en la compañía.".format(parent_code_len, str(digits)))
+        code = parent_account.code[:-digits] + partner_ref
 
         account_obj = self.env['account.account']
         account_id = account_obj.search([('code','=',code)])
