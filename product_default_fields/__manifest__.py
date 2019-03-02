@@ -4,6 +4,7 @@
 {
     'name': 'Product Default Fields',
     'version': '10.0.0.0.1',
+    "summary": "Set default fields to create a new product.",
     'depends': [
         'base',
         'account',
@@ -13,8 +14,6 @@
     'author': 'sdimar@yahoo.com',
     'website': '',
     'category': 'Product',
-    'description': '''
-    ''',
     'data': [],
     'installable': True,
     'auto_install': False,

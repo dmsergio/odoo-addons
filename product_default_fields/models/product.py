@@ -14,14 +14,16 @@ class ProductTemplate(models.Model):
         if 'search_default_filter_to_purchase' in self._context:
             res = self.get_default_fields(res)
             res = self.get_default_fields_purchase(res)
-        elif 'search_default_filter_to_sell' in self._context or 'search_default_consumable' in self._context:
+        elif 'search_default_filter_to_sell' in self._context or \
+                'search_default_consumable' in self._context:
             res = self.get_default_fields(res)
             res = self.get_default_fields_sale(res)
         return res
 
     def get_default_fields(self, field_values):
         """
-        Function to prepare the default fields to return in the product.template view
+        Function to prepare the default fields to return in the
+        product.template view
         :param fields: dict
         :return: dict
         """
@@ -38,12 +40,14 @@ class ProductTemplate(models.Model):
             'list_price': 0.0,
             'property_account_income_id': account_income_id.id or False,
             'property_account_expense_id': account_expense_id.id or False,
-            'property_account_creditor_price_difference': account_creditor_id.id or False})
+            'property_account_creditor_price_difference':
+                account_creditor_id.id or False})
         return field_values
 
     def get_default_fields_purchase(self, field_values):
         """
-        Function to prepare the default fields to return in the product.template view
+        Function to prepare the default fields to return in the
+        product.template view from purchase menu
         :param fields: dict
         :return: dict
         """
@@ -52,7 +56,8 @@ class ProductTemplate(models.Model):
         product_category_obj = self.env['product.category']
         # records
         product_uom_id = product_uom_obj.search([('name', '=', 'mm')])
-        product_category_id = product_category_obj.search([('name', '=', 'MATERIAS PRIMAS')])
+        product_category_id = product_category_obj.search([
+            ('name', '=', 'MATERIAS PRIMAS')])
         field_values.update({
             'type': 'product',
             'uom_id': product_uom_id.id or False,
@@ -63,19 +68,23 @@ class ProductTemplate(models.Model):
 
     def get_default_fields_sale(self, field_values):
         """
-        Function to prepare the default fields to return in the product.template view
+        Function to prepare the default fields to return in the
+        product.template view from sales/manufacture menu
         :param fields: dict
         :return: dict
         """
         # objects needed
         product_category_obj = self.env['product.category']
+        product_route_obj = self.env['stock.location.route']
         # records
         product_category_parent_id = product_category_obj.search([
             ('name', '=', 'PRODUCTO ACABADO')])
         product_category_id = product_category_obj.search([
             ('name', '=', 'MECANIZADO'),
             ('parent_id', '=', product_category_parent_id.id)])
+        product_route_ids = product_route_obj.search([
+            ('name', 'in', ['Fabricar', 'Bajo pedido'])])
         field_values.update({
             'categ_id': product_category_id.id or False,
-            'route_ids': [(6, 0, [1])]})
+            'route_ids': [(6, 0, product_route_ids.ids)]})
         return field_values
