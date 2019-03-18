@@ -2,8 +2,25 @@
 from odoo import api, fields, models
 
 
+class OrderList:
+    my_list = []
+
 class account_move_line(models.Model):
     _inherit = 'account.move.line'
+
+    remaining_amount = fields.Float(
+        "Saldo pendiente",
+        compute="_get_balance")
+
+    @api.multi
+    @api.depends('balance')
+    def _get_balance(self):
+        move_line_ids = OrderList.my_list
+        amount = 0.0
+        for line in move_line_ids:
+            amount += line.balance
+            line.remaining_amount = amount
+        return True
 
     @api.model
     def search(self, args, offset=0, limit=None, order=None):
@@ -14,6 +31,7 @@ class account_move_line(models.Model):
         """
         context = self._context or {}
         move_ids = super(account_move_line, self).search(args, offset, limit, order)
+        OrderList.my_list = move_ids
         if context.get('statement_of_accounts'):
             if move_ids:
                 if isinstance(move_ids, (long, int)):
