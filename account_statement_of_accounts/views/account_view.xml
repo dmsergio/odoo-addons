@@ -14,7 +14,8 @@
           <field name="journal_id"/>
           <field name="debit" sum="Total debit"/>
           <field name="credit" sum="Total credit"/>
-          <field name="balance"/>
+          <field name="remaining_amount"/>
+          <field name="balance" invisible="1"/>
           <field name="date_maturity"/>
           <field name="full_reconcile_id"/>
         </tree>
