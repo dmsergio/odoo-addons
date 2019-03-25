@@ -24,7 +24,8 @@ class accountStatementAccountsWizard(models.TransientModel):
     date_ini = fields.Date(
         string='Date Start',
         required=True,
-        default=fields.Date.from_string("{}-01-01".format(datetime.today().year)))
+        default=fields.Date.from_string("{}-01-01".format(
+            datetime.today().year)))
 
     date_end = fields.Date(
         string='Date End',
@@ -59,7 +60,8 @@ class accountStatementAccountsWizard(models.TransientModel):
             ('date', '>=', self.date_ini),
             ('date', '<=', self.date_end)]
 
-        view_id = self.env.ref('account_statement_of_accounts.account_move_line_statement_of_accounts_view')
+        view_id = self.env.ref('account_statement_of_accounts.'
+                               'account_move_line_statement_of_accounts_view')
         ctx = self.env.context.copy()
         ctx['active_ids'] = self.ids
         ctx['statement_of_accounts'] = True
@@ -76,6 +78,7 @@ class accountStatementAccountsWizard(models.TransientModel):
             'views': [(view_id.id, 'tree'), (False, 'form')],
             'context': ctx,
             'domain': domain,
+            'limit': 500,
             'res_model': 'account.move.line',
             'type': 'ir.actions.act_window',
             'name': title}
@@ -91,13 +94,16 @@ class accountStatementAccountsWizard(models.TransientModel):
             partner = obj_partner.browse(partner_id)
             if partner.customer:
                 value['account_id'] = \
-                    (partner.property_account_receivable_id.name and partner.property_account_receivable_id.id) or 0
+                    (partner.property_account_receivable_id.name and
+                     partner.property_account_receivable_id.id) or 0
             elif partner.supplier:
                 value['account_id'] = \
-                    (partner.property_account_payable_id.name and partner.property_account_payable_id.id) or 0
+                    (partner.property_account_payable_id.name and
+                     partner.property_account_payable_id.id) or 0
             else:
                 value['account_id'] = \
-                    (partner.property_account_receivable_id.name and partner.property_account_receivable_id.id) or 0
+                    (partner.property_account_receivable_id.name and
+                     partner.property_account_receivable_id.id) or 0
         else:
             value['account_id'] = 0
         return {'value': value}
