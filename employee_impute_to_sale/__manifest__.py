@@ -26,10 +26,14 @@
     "website": "",
     "summary": "Impute employee costs to sale orders",
     "depends": [
-        "product"
+        "product",
+        "hr",
+        "sale"
     ],
     "data": [
         'views/product_template_view.xml',
+        'views/hr_employee_view.xml',
+        'views/impute_to_sale_wiz_view.xml',
     ],
     "active": False,
     "installable": True,
