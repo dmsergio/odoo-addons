@@ -10,22 +10,22 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     regular_night_price = fields.Float(
-        string="Precio de venta Nocturno")
+        string="Precio Nocturno")
 
     regular_holiday_price = fields.Float(
-        string="Precio de venta Festivo")
+        string="Precio Festivo")
 
     regular_night_holiday_price = fields.Float(
-        string="Precio de venta Nocturno/Festivo")
+        string="Precio Nocturno/Festivo")
 
     vip_price = fields.Float(
-        string="Precio de venta VIP")
+        string="Precio VIP")
 
     vip_night_price = fields.Float(
-        string="Precio de venta Nocturno VIP")
+        string="Precio Nocturno VIP")
 
     vip_holiday_price = fields.Float(
-        string="Precio de venta Festivo VIP")
+        string="Precio Festivo VIP")
 
     vip_night_holiday_price = fields.Float(
-        string="Precio de venta Nocturno/Festivo VIP")
+        string="Precio Nocturno/Festivo VIP")
