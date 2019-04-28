@@ -56,6 +56,13 @@ class ImputeToSaleWiz(models.TransientModel):
             "product_uom_qty": product_uom_qty,
             "price_unit": price_unit,
             "order_date": order_date})
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'impute.to_sale.wiz',
+            'context': self.env.context,
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new'}
 
     @api.onchange('product_id')
     def onchange_product_id(self):
@@ -68,7 +75,6 @@ class ImputeToSaleWiz(models.TransientModel):
         employee_product_id = self.get_employee_product()
         category_id = self.get_machines_category()
         product_ids = self.env["product.template"].search([
-            ("type", "=", "service"),
             ("categ_id", "=", category_id.id)])
         filter_products = product_ids.ids + employee_product_id
         return {

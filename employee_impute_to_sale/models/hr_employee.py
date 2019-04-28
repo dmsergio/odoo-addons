@@ -11,8 +11,7 @@ class HrEmployee(models.Model):
 
     product_id = fields.Many2one(
         comodel_name="product.template",
-        string="Producto relacionado",
-        domain="[('type', '=', 'service')]")
+        string="Producto relacionado")
 
     def launch_impute_sale_wiz(self):
         return {
