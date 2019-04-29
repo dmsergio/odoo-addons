@@ -33,6 +33,7 @@
     "data": [
         'views/product_template_view.xml',
         'views/hr_employee_view.xml',
+        'views/sale_order_line.xml',
         'views/impute_to_sale_wiz_view.xml',
     ],
     "active": False,
