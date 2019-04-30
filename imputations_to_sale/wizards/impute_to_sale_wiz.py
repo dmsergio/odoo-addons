@@ -20,8 +20,8 @@ class ImputeToSaleWiz(models.TransientModel):
     product_id = fields.Many2one(
         comodel_name="product.template",
         string="Producto",
-        help="Especifique el producto, ya sea el producto relacionado con el "
-             "empleado actual, o bien una máquina.",
+        help="Especifique el producto, ya sea de OPERARIOS o de LABORES, al "
+             "que se utilizará para realizar la imputación del precio.",
         required=True)
 
     type_working_day = fields.Selection(
@@ -72,18 +72,18 @@ class ImputeToSaleWiz(models.TransientModel):
         producto del empleado.
         :return: dict
         """
-        employee_product_id = self.get_employee_product()
-        category_id = self.get_machines_category()
+        operator_category_ids = self.get_operator_category()
+        machine_category_ids = self.get_machine_category()
+        categories = operator_category_ids + machine_category_ids
         product_ids = self.env["product.template"].search([
-            ("categ_id", "=", category_id.id)])
-        filter_products = product_ids.ids + employee_product_id
+            ("categ_id", "in", categories)])
         return {
             "domain": {
-                "product_id": [("id", "in", filter_products)]}}
+                "product_id": [("id", "in", product_ids.ids)]}}
 
     def get_price_unit(self, product_id):
-        employee_product_id = self.get_employee_product()
-        if product_id.id in employee_product_id:
+        parent_operator_category_id = self.get_parent_operator_category()
+        if product_id.categ_id.parent_id.id == parent_operator_category_id:
             if not self.vip_customer:
                 if self.type_working_day == 'regular':
                     price = product_id.list_price
@@ -107,9 +107,13 @@ class ImputeToSaleWiz(models.TransientModel):
                 product_id.list_price
         return price
 
-    def get_machines_category(self):
-        return self.env["product.category"].browse(770)
+    def get_machine_category(self):
+        return self.env["product.category"].browse(770).ids
 
-    def get_employee_product(self):
-        employee_id = self.env["hr.employee"].browse(self._context["active_id"])
-        return employee_id.product_id.ids if employee_id.product_id else []
+    def get_parent_operator_category(self):
+        return self.env["product.category"].browse(769).id
+
+    def get_operator_category(self):
+        parent_category_id = self.get_parent_operator_category()
+        return self.env["product.category"].search([
+            ("parent_id", "=", parent_category_id)]).ids
