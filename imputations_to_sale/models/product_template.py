@@ -29,22 +29,25 @@ class ProductTemplate(models.Model):
 
     vip_night_holiday_price = fields.Float(
         string="Precio Nocturno/Festivo VIP")
-    categ_labors = fields.Boolean(string="Labores", compute='_compute_categ_id')
-    categ_operators = fields.Boolean(string="Operarios", compute='_compute_categ_id')
+    categ_labors = fields.Boolean(string="Labores", compute='_compute_operators_categ_id')
+    categ_operators = fields.Boolean(string="Operarios", compute='_compute_operators_categ_id')
 
     @api.one
     @api.depends('categ_id')
-    def _compute_categ_id(self):
+    def _compute_operators_categ_id(self):
         """ Este método muestra la pestaña Precios de venta en función del
             del tipo de categoria selseccionado por el usuario"""
+        machine_category_ids = self.get_machine_category()
         categ_obj = self.env['product.category']
-        categ_id = categ_obj.search([('id', '=', self.categ_id.id)])
-        if categ_id:
-            id_labors = 770
-            id_operators = 769
-            if categ_id.id == id_labors:
-                self.categ_labors = True
-            elif categ_id.id == id_operators:
-                self.categ_operators = True
-            else:
-                return False
+        parent_category_id = categ_obj.browse(769).id
+        category_ids = categ_obj.search([
+            ("parent_id", "=", parent_category_id)]).ids
+        if self.categ_id.id in category_ids or self.categ_id.id == parent_category_id:
+            self.categ_operators = True
+        elif self.categ_id.id in machine_category_ids:
+            self.categ_labors = True
+        else:
+            return False
+
+    def get_machine_category(self):
+        return self.env["product.category"].browse(770).ids
