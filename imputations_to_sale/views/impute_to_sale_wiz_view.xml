@@ -21,6 +21,19 @@
               </group>
             </group>
             <group>
+              <field name="sale_order_line_ids" readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}">
+                <tree>
+                  <field name="product_id"/>
+                  <field name="name"/>
+                  <field name="product_uom_qty"/>
+                  <field name="product_uom"/>
+                  <field name="order_date"/>
+                  <field name="price_unit"/>
+                  <field name="price_subtotal"/>
+                </tree>
+              </field>
+            </group>
+            <group>
               <div class="alert alert-info">
                 <p>En el momento de pulsar sobre el botón <b>Aplicar</b>, se creará una línea en el pedido de venta
                   con los datos indicados en la parte superior, y automáticamente se resetearán los valores para poder

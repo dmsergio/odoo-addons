@@ -17,6 +17,10 @@ class ImputeToSaleWiz(models.TransientModel):
                "('invoice_status', '!=', 'invoiced')]",
         required=True)
 
+    sale_order_line_ids = fields.Many2many(
+        comodel_name="sale.order.line",
+        string="Líneas del pedido")
+
     product_id = fields.Many2one(
         comodel_name="product.template",
         string="Producto",
@@ -56,10 +60,12 @@ class ImputeToSaleWiz(models.TransientModel):
             "product_uom_qty": product_uom_qty,
             "price_unit": price_unit,
             "order_date": order_date})
+        context = self.env.context.copy()
+        context["default_sale_id"] = self.sale_id.id
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'impute.to_sale.wiz',
-            'context': self.env.context,
+            'context': context,
             'view_type': 'form',
             'view_mode': 'form',
             'target': 'new'}
@@ -117,3 +123,9 @@ class ImputeToSaleWiz(models.TransientModel):
         parent_category_id = self.get_parent_operator_category()
         return self.env["product.category"].search([
             ("parent_id", "=", parent_category_id)]).ids
+
+    @api.onchange('sale_id')
+    def onchange_sale_id(self):
+        if self.sale_id:
+            self.sale_order_line_ids = [(6, 0, self.sale_id.order_line.ids)]
+        return
