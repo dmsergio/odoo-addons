@@ -60,10 +60,12 @@ class ImputeToSaleWiz(models.TransientModel):
             "product_uom_qty": product_uom_qty,
             "price_unit": price_unit,
             "order_date": order_date})
+        context = self.env.context.copy()
+        context["default_sale_id"] = self.sale_id.id
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'impute.to_sale.wiz',
-            'context': self.env.context,
+            'context': context,
             'view_type': 'form',
             'view_mode': 'form',
             'target': 'new'}
@@ -127,7 +129,3 @@ class ImputeToSaleWiz(models.TransientModel):
         if self.sale_id:
             self.sale_order_line_ids = [(6, 0, self.sale_id.order_line.ids)]
         return
-            # return {
-            #     "values": {
-            #         "sale_order_line_ids": [
-            #             (6, 0, self.sale_id.order_line.ids)]}}
