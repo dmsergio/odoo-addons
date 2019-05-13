@@ -36,8 +36,7 @@ class ImputeToSaleWiz(models.TransientModel):
         string="Tipo de jornada",
         default="regular")
 
-    vip_customer = fields.Boolean(
-        string="Cliente VIP?")
+    vip_customer = fields.Boolean(string="Cliente VIP?")
 
     quantity = fields.Float(
         string="Cantidad")
@@ -45,6 +44,10 @@ class ImputeToSaleWiz(models.TransientModel):
     order_date = fields.Date(
         string="Fecha",
         default=datetime.datetime.now().date())
+
+    partner_id = fields.Many2one(comodel_name="res.partner",
+                                   string="Cliente",
+                                   readonly=True)
 
     def create_impute_to_sale(self):
         order_id = self.sale_id
@@ -90,7 +93,7 @@ class ImputeToSaleWiz(models.TransientModel):
     def get_price_unit(self, product_id):
         parent_operator_category_id = self.get_parent_operator_category()
         if product_id.categ_id.parent_id.id == parent_operator_category_id:
-            if not self.vip_customer:
+            if not self.sale_id.partner_id:
                 if self.type_working_day == 'regular':
                     price = product_id.list_price
                 elif self.type_working_day == 'night':
@@ -109,7 +112,7 @@ class ImputeToSaleWiz(models.TransientModel):
                 else:
                     price = product_id.vip_night_holiday_price
         else:
-            price = product_id.vip_price if self.vip_customer else \
+            price = product_id.vip_price if self.sale_id.partner_id else \
                 product_id.list_price
         return price
 
@@ -127,5 +130,10 @@ class ImputeToSaleWiz(models.TransientModel):
     @api.onchange('sale_id')
     def onchange_sale_id(self):
         if self.sale_id:
+            self.vip_customer = self.sale_id.partner_id.partner_vip
+            self.partner_id = self.sale_id.partner_id.id
             self.sale_order_line_ids = [(6, 0, self.sale_id.order_line.ids)]
         return
+
+
+
