@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 {
     "name": "Imputations To Sales",
-    "version": "10.0.0.0.2",
+    "version": "10.0.0.0.3",
     "author": "Sergio Díaz",
     "category": "Human Resources",
     "website": "",

@@ -29,8 +29,14 @@ class ProductTemplate(models.Model):
 
     vip_night_holiday_price = fields.Float(
         string="Precio Nocturno/Festivo VIP")
-    categ_labors = fields.Boolean(string="Labores", compute='_compute_operators_categ_id')
-    categ_operators = fields.Boolean(string="Operarios", compute='_compute_operators_categ_id')
+
+    categ_labors = fields.Boolean(
+        string="Labores",
+        compute='_compute_operators_categ_id')
+
+    categ_operators = fields.Boolean(
+        string="Operarios",
+        compute='_compute_operators_categ_id')
 
     @api.one
     @api.depends('categ_id')
@@ -42,7 +48,8 @@ class ProductTemplate(models.Model):
         parent_category_id = categ_obj.browse(769).id
         category_ids = categ_obj.search([
             ("parent_id", "=", parent_category_id)]).ids
-        if self.categ_id.id in category_ids or self.categ_id.id == parent_category_id:
+        if self.categ_id.id in category_ids or \
+                self.categ_id.id == parent_category_id:
             self.categ_operators = True
         elif self.categ_id.id in machine_category_ids:
             self.categ_labors = True
@@ -51,3 +58,14 @@ class ProductTemplate(models.Model):
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
+
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|',
+                      ('name', operator, name),
+                      ('default_code', operator, name)]
+        product_ids = self.search(domain + args, limit=limit)
+        return product_ids.name_get()
