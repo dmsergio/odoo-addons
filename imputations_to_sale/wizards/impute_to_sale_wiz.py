@@ -134,6 +134,3 @@ class ImputeToSaleWiz(models.TransientModel):
             self.partner_id = self.sale_id.partner_id.id
             self.sale_order_line_ids = [(6, 0, self.sale_id.order_line.ids)]
         return
-
-
-
