@@ -15,6 +15,7 @@
         'views/product_template_view.xml',
         'views/sale_order_line.xml',
         'views/impute_to_sale_wiz_view.xml',
+        'views/impute_hours_wiz_view.xml',
         'views/res_partner_view.xml',
     ],
     "active": False,
