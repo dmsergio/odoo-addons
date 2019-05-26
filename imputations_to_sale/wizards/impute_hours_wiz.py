@@ -6,6 +6,10 @@ from odoo import models, fields, api, _
 import datetime
 from odoo.exceptions import UserError
 
+class CurrentSaleId():
+
+    sale_id = False
+
 
 class ImputeHoursWiz(models.TransientModel):
 
@@ -20,8 +24,7 @@ class ImputeHoursWiz(models.TransientModel):
         comodel_name="sale.order",
         string="Pedido de venta",
         domain="[('state', '!=', 'cancel'),"
-               "('invoice_status', '!=', 'invoiced')]",
-        required=True)
+               "('invoice_status', '!=', 'invoiced')]")
 
     product_id = fields.Many2one(
         comodel_name="product.template",
@@ -72,8 +75,7 @@ class ImputeHoursWiz(models.TransientModel):
              "tiempos.",
         readonly=True)
 
-    has_work_order_quantity_ids = fields.Boolean(
-        compute="_compute_has_work_order_quantity_ids")
+    has_work_order_quantity_ids = fields.Boolean()
 
     @api.multi
     def create_impute_to_sale(self):
@@ -93,18 +95,18 @@ class ImputeHoursWiz(models.TransientModel):
         price_unit = self.get_price_unit(product_id)
         self.create_sale_order_line(product_id, product_qty, price_unit)
         context = self.env.context.copy()
-        context["default_sale_id"] = self.sale_id.id
+        context["default_sale_id"] = CurrentSaleId.sale_id.id
         return {
             "type": "ir.actions.act_window",
             "res_model": "impute.hours.wiz",
             "context": context,
             "view_type": "form",
             "view_mode": "form",
-            "target": "current"}
+            "target": "inline"}
 
     def create_sale_order_line(self, product_id, product_qty, price_unit):
         self.env["sale.order.line"].create({
-            "order_id": self.sale_id.id,
+            "order_id": CurrentSaleId.sale_id.id,
             "product_id": product_id.id,
             "product_uom": product_id.uom_id.id,
             "product_uom_qty": product_qty,
@@ -113,8 +115,9 @@ class ImputeHoursWiz(models.TransientModel):
 
     def get_price_unit(self, product_id):
         parent_operator_category_id = self.get_parent_operator_category()
+        sale_id = CurrentSaleId.sale_id
         if product_id.categ_id.parent_id.id == parent_operator_category_id:
-            if not self.sale_id.partner_id:
+            if not sale_id.partner_id.partner_vip:
                 if self.type_working_day == 'regular':
                     price = product_id.list_price
                 elif self.type_working_day == 'night':
@@ -133,7 +136,7 @@ class ImputeHoursWiz(models.TransientModel):
                 else:
                     price = product_id.vip_night_holiday_price
         else:
-            price = product_id.vip_price if self.sale_id.partner_id else \
+            price = product_id.vip_price if sale_id.partner_id else \
                 product_id.list_price
         return price
 
@@ -151,12 +154,14 @@ class ImputeHoursWiz(models.TransientModel):
     @api.onchange("sale_id")
     def onchange_sale_id(self):
         if self.sale_id:
+            CurrentSaleId.sale_id = self.sale_id
             self.vip_customer = self.sale_id.partner_id.partner_vip
             self.partner_id = self.sale_id.partner_id.id
             categories = \
                 self.get_operator_category() + self.get_machine_category()
             line_ids = self.sale_id.order_line.filtered(
                 lambda x: x.product_id.categ_id.id in categories)
+            line_ids.sorted(key='order_date', reverse=True)
             self.sale_order_line_ids = [(6, 0, line_ids.ids)]
             self.compute_hours_and_subtotal(line_ids)
             return
@@ -164,6 +169,7 @@ class ImputeHoursWiz(models.TransientModel):
         self.partner_id = False
         self.total_hours = False
         self.subtotal = False
+        CurrentSaleId.sale_id = False
 
     def compute_hours_and_subtotal(self, line_ids):
         """
@@ -190,8 +196,8 @@ class ImputeHoursWiz(models.TransientModel):
             "domain": {
                 "product_id": [("id", "in", product_ids.ids)]}}
 
-    @api.one
-    def _compute_has_work_order_quantity_ids(self):
+    @api.onchange("work_order_quantity_ids")
+    def onchange_work_order_quantity_ids(self):
         if len(self.work_order_quantity_ids) > 0:
             self.has_work_order_quantity_ids = True
         else:

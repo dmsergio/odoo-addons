@@ -40,8 +40,10 @@
               </group>
             </group>
             <group>
-              <field name="sale_order_line_ids" readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}">
-                <tree>
+              <field name="sale_order_line_ids"
+                     readonly="1"
+                     attrs="{'invisible': [('sale_id', '=', False)]}">
+                <tree default_order="order_date desc">
                   <field name="product_id"/>
                   <field name="name"/>
                   <field name="product_uom_qty"/>
@@ -61,7 +63,7 @@
 			<field name="name">Registro de tiempos</field>
 			<field name="res_model">impute.hours.wiz</field>
 			<field name="view_mode">form</field>
-			<field name="target">current</field>
+			<field name="target">inline</field>
 		</record>
 
     <menuitem id="impute_hours_wiz_menu"
