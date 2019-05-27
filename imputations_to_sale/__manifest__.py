@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 {
     "name": "Imputations To Sales",
-    "version": "10.0.0.0.3",
+    "version": "10.0.0.0.4",
     "author": "Sergio Díaz",
     "category": "Human Resources",
     "website": "",
@@ -12,10 +12,11 @@
         "sales_team"
     ],
     "data": [
+        'data/manual_product_template.xml',
         'views/product_template_view.xml',
         'views/sale_order_line.xml',
-        'views/impute_to_sale_wiz_view.xml',
         'views/impute_hours_wiz_view.xml',
+        'views/impute_to_sale_wiz_view.xml',
         'views/res_partner_view.xml',
     ],
     "active": False,

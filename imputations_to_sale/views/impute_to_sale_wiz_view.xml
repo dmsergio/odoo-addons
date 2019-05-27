@@ -63,11 +63,6 @@
 			<field name="target">new</field>
 		</record>
 
-    <menuitem id="impute_to_sale_menu"
-							parent="sales_team.menu_base_partner"
-              name="Imputaciones"
-							sequence="6"/>
-
     <menuitem id="impute_to_sale_wiz_menu"
 							name="Crear imputación"
 							parent="impute_to_sale_menu"

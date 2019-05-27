@@ -83,12 +83,14 @@ class ImputeHoursWiz(models.TransientModel):
             raise UserError(_(
                 "Por favor, indica los tiempos a registrar de los puestos de "
                 "trabajo. Gracias."))
+        manual_product_id = self.env.ref("imputations_to_sale.manual_product")
         # creación de las líneas del pedido de venta de los puestos de trabajo
         for work_order_quantity_id in self.work_order_quantity_ids:
-            product_id = work_order_quantity_id.product_id
-            product_qty = work_order_quantity_id.product_qty
-            price_unit = self.get_price_unit(product_id)
-            self.create_sale_order_line(product_id, product_qty, price_unit)
+            if work_order_quantity_id.product_id.id != manual_product_id.id:
+                product_id = work_order_quantity_id.product_id
+                product_qty = work_order_quantity_id.product_qty
+                price_unit = self.get_price_unit(product_id)
+                self.create_sale_order_line(product_id, product_qty, price_unit)
         # creación de la línea correspondiente al producto operario
         product_id = self.product_id
         product_qty = sum(self.work_order_quantity_ids.mapped("product_qty"))
