@@ -66,6 +66,11 @@
 			<field name="target">inline</field>
 		</record>
 
+    <menuitem id="impute_to_sale_menu"
+							parent="sales_team.menu_base_partner"
+              name="Registros"
+							sequence="6"/>
+
     <menuitem id="impute_hours_wiz_menu"
 							name="Registro de tiempos"
 							parent="impute_to_sale_menu"

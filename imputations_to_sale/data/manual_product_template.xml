@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+  <record model="product.template" id="manual_product">
+    <field name="name">Manual</field>
+    <field name="type">consu</field>
+    <field name="default_code">01</field>
+    <field name="sale_ok">True</field>
+    <field name="purchase_ok">False</field>
+    <field name="categ_id" ref="product.product_category_all"/>
+    <field name="uom_id" ref="product.product_uom_unit"/>
+    <field name="uom_po_id" ref="product.product_uom_unit"/>
+  </record>
+
+</odoo>
