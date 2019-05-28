@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="impute_material_wiz_form_view" model="ir.ui.view">
+      <field name="name">impute_material_wiz_form_view</field>
+      <field name="model">impute.material.wiz</field>
+      <field name="arch" type="xml">
+        <form string="Registro de Productos">
+          <sheet>
+            <group>
+              <group>
+                <field name="partner_id" />
+                <field name="sale_id" options="{'no_create': True}"/>
+                <field name="product_id" domain="[('type', '=','product')]" options="{'no_create': True}"/>
+              </group>
+              <group>
+                <field name="order_date"/>
+                <field name="quantity"/>
+              </group>
+                <group>
+                    <button name="create_impute_to_sale"
+                      string="Aplicar"
+                      type="object"/>
+              </group>
+            </group>
+            <group>
+              <field name="sale_order_line_ids" readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}">
+                <tree>
+                  <field name="product_id"/>
+                  <field name="name"/>
+                  <field name="product_uom_qty"/>
+                  <field name="product_uom"/>
+                  <field name="order_date"/>
+                  <field name="price_unit"/>
+                  <field name="price_subtotal"/>
+                </tree>
+              </field>
+            </group>
+            <group>
+              <div class="alert alert-info">
+                <p>En el momento de pulsar sobre el botón <b>Aplicar</b>, se creará una línea en el pedido de venta
+                  con los datos indicados en la parte superior, y automáticamente se resetearán los valores para poder
+                  seguir haciendo más imputaciones.
+                </p>
+              </div>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+
+        <record id="impute_material_wiz_action" model="ir.actions.act_window">
+			<field name="name">Registro de productos</field>
+			<field name="res_model">impute.material.wiz</field>
+			<field name="view_mode">form</field>
+			<field name="target">inline</field>
+		</record>
+
+        <menuitem id="impute_to_sale_menu"
+							parent="sales_team.menu_base_partner"
+              name="Registros"
+							sequence="6"/>
+
+        <menuitem id="impute_material_wiz_menu"
+							name="Registro de productos"
+							parent="impute_to_sale_menu"
+							action="impute_material_wiz_action"
+							sequence="11"/>
+    </data>
+</odoo>
