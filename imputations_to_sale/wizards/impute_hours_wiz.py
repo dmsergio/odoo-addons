@@ -163,7 +163,6 @@ class ImputeHoursWiz(models.TransientModel):
                 self.get_operator_category() + self.get_machine_category()
             line_ids = self.sale_id.order_line.filtered(
                 lambda x: x.product_id.categ_id.id in categories)
-            line_ids.sorted(key='order_date', reverse=True)
             self.sale_order_line_ids = [(6, 0, line_ids.ids)]
             self.compute_hours_and_subtotal(line_ids)
             return

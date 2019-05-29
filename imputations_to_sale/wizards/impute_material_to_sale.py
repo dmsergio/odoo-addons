@@ -39,8 +39,6 @@ class ImputeHoursWiz(models.TransientModel):
                                  string="Cliente",
                                  readonly=True)
 
-
-
     def create_impute_to_sale(self):
         order_id = self.sale_id
         product_id = self.product_id.product_variant_id
@@ -84,5 +82,7 @@ class ImputeHoursWiz(models.TransientModel):
     def onchange_sale_id(self):
         if self.sale_id:
             self.partner_id = self.sale_id.partner_id.id
-            self.sale_order_line_ids = [(6, 0, self.sale_id.order_line.ids)]
+            line_ids = self.sale_id.order_line.filtered(
+                lambda x: x.product_id.type == "product")
+            self.sale_order_line_ids = [(6, 0, line_ids.ids)]
         return
