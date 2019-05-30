@@ -9,13 +9,14 @@
           <sheet>
             <group>
               <group>
+                <field name="s_title"/>
                 <field name="partner_id"/>
                 <field name="sale_id" options="{'no_create': True}"/>
                 <field name="product_id" domain="[('type', '=','product')]" options="{'no_create': True}"/>
-              </group>
-              <group>
                 <field name="order_date"/>
                 <field name="quantity"/>
+              </group>
+              <group>
               </group>
               <group>
                 <button name="create_impute_to_sale"
