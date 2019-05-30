@@ -6,9 +6,11 @@ from odoo import models, fields, api, _
 import datetime
 from odoo.exceptions import UserError
 
-class CurrentSaleId():
+
+class CurrentValues():
 
     sale_id = False
+    product_id = False
 
 
 class ImputeHoursWiz(models.TransientModel):
@@ -31,8 +33,7 @@ class ImputeHoursWiz(models.TransientModel):
         string="Operario",
         help="Producto operario sobre el que se realizará el registro de "
              "tiempos, teniendo en cuenta cada uno de los registros en los "
-             "puestos de trabajo indicados.",
-        required=True)
+             "puestos de trabajo indicados.")
 
     type_working_day = fields.Selection(
         [("regular", "Normal"),
@@ -41,6 +42,10 @@ class ImputeHoursWiz(models.TransientModel):
          ("night_holiday", "Nocturna/Festiva")],
         string="Tipo de jornada",
         default="regular")
+
+    title = fields.Char(
+        string="Título",
+        readonly=True)
 
     vip_customer = fields.Boolean(
         string="Cliente VIP?",
@@ -70,7 +75,7 @@ class ImputeHoursWiz(models.TransientModel):
 
     sale_order_line_ids = fields.Many2many(
         comodel_name="sale.order.line",
-        string="Líneas del pedido",
+        string="Tiempos del operario",
         help="Líneas del pedido de venta seleccionado con el registro de "
              "tiempos.",
         readonly=True)
@@ -92,12 +97,12 @@ class ImputeHoursWiz(models.TransientModel):
                 price_unit = self.get_price_unit(product_id)
                 self.create_sale_order_line(product_id, product_qty, price_unit)
         # creación de la línea correspondiente al producto operario
-        product_id = self.product_id
+        product_id = CurrentValues.product_id
         product_qty = sum(self.work_order_quantity_ids.mapped("product_qty"))
         price_unit = self.get_price_unit(product_id)
         self.create_sale_order_line(product_id, product_qty, price_unit)
         context = self.env.context.copy()
-        context["default_sale_id"] = CurrentSaleId.sale_id.id
+        context["default_product_id"] = CurrentValues.product_id.id
         return {
             "type": "ir.actions.act_window",
             "res_model": "impute.hours.wiz",
@@ -107,17 +112,21 @@ class ImputeHoursWiz(models.TransientModel):
             "target": "inline"}
 
     def create_sale_order_line(self, product_id, product_qty, price_unit):
-        self.env["sale.order.line"].create({
-            "order_id": CurrentSaleId.sale_id.id,
+        line_values = {
+            "order_id": CurrentValues.sale_id.id,
             "product_id": product_id.id,
+            # "operator_product_id": CurrentValues.product_id.id,
             "product_uom": product_id.uom_id.id,
             "product_uom_qty": product_qty,
+            "type_working_day": self.type_working_day,
             "price_unit": price_unit,
-            "order_date": self.order_date})
+            "order_date": self.order_date}
+        self.env["sale.order.line"].create(line_values)
+        self.env.cr.commit()
 
     def get_price_unit(self, product_id):
         parent_operator_category_id = self.get_parent_operator_category()
-        sale_id = CurrentSaleId.sale_id
+        sale_id = CurrentValues.sale_id
         if product_id.categ_id.parent_id.id == parent_operator_category_id:
             if not sale_id.partner_id.partner_vip:
                 if self.type_working_day == 'regular':
@@ -153,24 +162,39 @@ class ImputeHoursWiz(models.TransientModel):
         return self.env["product.category"].search([
             ("parent_id", "=", parent_category_id)]).ids
 
+    @api.onchange("product_id", "order_date")
+    def onchange_and_date_product_id(self):
+        operator_category_ids = self.get_operator_category()
+        product_ids = self.env["product.template"].search([
+            ("categ_id", "in", operator_category_ids)])
+        res = {
+            "domain": {
+                "product_id": [("id", "in", product_ids.ids)]}}
+        if self.product_id and self.order_date:
+            CurrentValues.product_id = self.product_id
+            sale_order_line_obj = self.env["sale.order.line"]
+            line_ids = sale_order_line_obj.search([
+                ("operator_product_id", "=", self.product_id.id),
+                ("order_date", "=", self.order_date)])
+            self.sale_order_line_ids = [(6, 0, line_ids.ids)]
+            self.compute_hours_and_subtotal(line_ids)
+            return res
+        self.total_hours = False
+        self.subtotal = False
+        return res
+
     @api.onchange("sale_id")
     def onchange_sale_id(self):
         if self.sale_id:
-            CurrentSaleId.sale_id = self.sale_id
+            CurrentValues.sale_id = self.sale_id
             self.vip_customer = self.sale_id.partner_id.partner_vip
             self.partner_id = self.sale_id.partner_id.id
-            categories = \
-                self.get_operator_category() + self.get_machine_category()
-            line_ids = self.sale_id.order_line.filtered(
-                lambda x: x.product_id.categ_id.id in categories)
-            self.sale_order_line_ids = [(6, 0, line_ids.ids)]
-            self.compute_hours_and_subtotal(line_ids)
+            self.title = self.sale_id.s_title
             return
         self.vip_customer = False
         self.partner_id = False
-        self.total_hours = False
-        self.subtotal = False
-        CurrentSaleId.sale_id = False
+        self.title = False
+        return
 
     def compute_hours_and_subtotal(self, line_ids):
         """
@@ -179,23 +203,11 @@ class ImputeHoursWiz(models.TransientModel):
         :param line_ids: sale.order.line().
         :return: None
         """
-        self.total_hours = sum(line_ids.mapped("product_uom_qty"))
+        self.total_hours = sum(line_ids.filtered(
+            lambda x: x.product_id.id == self.product_id.id).mapped(
+            "product_uom_qty"))
         self.subtotal = sum(line_ids.mapped("price_subtotal"))
         return
-
-    @api.onchange("product_id")
-    def onchange_product_id(self):
-        """
-        Onchange para agregar un domain al product_id y así poder filtrar por
-        los productos que pertenecen a la categoría de OPERARIOS.
-        :return: dict
-        """
-        operator_category_ids = self.get_operator_category()
-        product_ids = self.env["product.template"].search([
-            ("categ_id", "in", operator_category_ids)])
-        return {
-            "domain": {
-                "product_id": [("id", "in", product_ids.ids)]}}
 
     @api.onchange("work_order_quantity_ids")
     def onchange_work_order_quantity_ids(self):

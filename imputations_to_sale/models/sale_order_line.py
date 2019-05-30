@@ -13,3 +13,15 @@ class SaleOrder(models.Model):
     order_date = fields.Date(
         string="Fecha",
         default=datetime.datetime.now().date())
+
+    operator_product_id = fields.Many2one(
+        comodel_name="product.template",
+        string="Operario")
+
+    type_working_day = fields.Selection(
+        [("regular", "Normal"),
+         ("night", "Nocturna"),
+         ("holiday", "Festiva"),
+         ("night_holiday", "Nocturna/Festiva")],
+        string="Tipo de jornada",
+        default="regular")
