@@ -38,6 +38,8 @@ class ImputeHoursWiz(models.TransientModel):
     partner_id = fields.Many2one(comodel_name="res.partner",
                                  string="Cliente",
                                  readonly=True)
+    s_title = fields.Char(string="Title", readonly=True)
+    
 
     def create_impute_to_sale(self):
         order_id = self.sale_id
@@ -61,7 +63,7 @@ class ImputeHoursWiz(models.TransientModel):
             'context': context,
             'view_type': 'form',
             'view_mode': 'form',
-            'target': 'new'}
+            'target': 'inline'}
 
 
     @api.onchange('product_id')
@@ -82,6 +84,7 @@ class ImputeHoursWiz(models.TransientModel):
     def onchange_sale_id(self):
         if self.sale_id:
             self.partner_id = self.sale_id.partner_id.id
+            self.s_title = self.sale_id.s_title
             line_ids = self.sale_id.order_line.filtered(
                 lambda x: x.product_id.type == "product")
             self.sale_order_line_ids = [(6, 0, line_ids.ids)]
