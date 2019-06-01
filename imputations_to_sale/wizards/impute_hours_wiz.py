@@ -97,12 +97,14 @@ class ImputeHoursWiz(models.TransientModel):
                 price_unit = self.get_price_unit(product_id)
                 self.create_sale_order_line(product_id, product_qty, price_unit)
         # creación de la línea correspondiente al producto operario
-        product_id = CurrentValues.product_id
+        product_id = self.env["product.template"].browse(
+            CurrentValues.product_id)
         product_qty = sum(self.work_order_quantity_ids.mapped("product_qty"))
         price_unit = self.get_price_unit(product_id)
         self.create_sale_order_line(product_id, product_qty, price_unit)
         context = self.env.context.copy()
-        context["default_product_id"] = CurrentValues.product_id.id
+        context["default_product_id"] = product_id.id
+        context["default_order_date"] = self.order_date
         return {
             "type": "ir.actions.act_window",
             "res_model": "impute.hours.wiz",
@@ -112,21 +114,23 @@ class ImputeHoursWiz(models.TransientModel):
             "target": "inline"}
 
     def create_sale_order_line(self, product_id, product_qty, price_unit):
+        sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
+        operator_product_id = self.env["product.template"].browse(
+            CurrentValues.product_id)
         line_values = {
-            "order_id": CurrentValues.sale_id.id,
+            "order_id": sale_id.id,
             "product_id": product_id.id,
-            # "operator_product_id": CurrentValues.product_id.id,
+            "operator_product_id": operator_product_id.id,
             "product_uom": product_id.uom_id.id,
             "product_uom_qty": product_qty,
             "type_working_day": self.type_working_day,
             "price_unit": price_unit,
             "order_date": self.order_date}
         self.env["sale.order.line"].create(line_values)
-        self.env.cr.commit()
 
     def get_price_unit(self, product_id):
         parent_operator_category_id = self.get_parent_operator_category()
-        sale_id = CurrentValues.sale_id
+        sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
         if product_id.categ_id.parent_id.id == parent_operator_category_id:
             if not sale_id.partner_id.partner_vip:
                 if self.type_working_day == 'regular':
@@ -147,8 +151,7 @@ class ImputeHoursWiz(models.TransientModel):
                 else:
                     price = product_id.vip_night_holiday_price
         else:
-            price = product_id.vip_price if sale_id.partner_id else \
-                product_id.list_price
+            price = product_id.list_price
         return price
 
     def get_machine_category(self):
@@ -171,7 +174,7 @@ class ImputeHoursWiz(models.TransientModel):
             "domain": {
                 "product_id": [("id", "in", product_ids.ids)]}}
         if self.product_id and self.order_date:
-            CurrentValues.product_id = self.product_id
+            CurrentValues.product_id = self.product_id.id
             sale_order_line_obj = self.env["sale.order.line"]
             line_ids = sale_order_line_obj.search([
                 ("operator_product_id", "=", self.product_id.id),
@@ -179,6 +182,7 @@ class ImputeHoursWiz(models.TransientModel):
             self.sale_order_line_ids = [(6, 0, line_ids.ids)]
             self.compute_hours_and_subtotal(line_ids)
             return res
+        CurrentValues.product_id = False
         self.total_hours = False
         self.subtotal = False
         return res
@@ -186,11 +190,12 @@ class ImputeHoursWiz(models.TransientModel):
     @api.onchange("sale_id")
     def onchange_sale_id(self):
         if self.sale_id:
-            CurrentValues.sale_id = self.sale_id
+            CurrentValues.sale_id = self.sale_id.id
             self.vip_customer = self.sale_id.partner_id.partner_vip
             self.partner_id = self.sale_id.partner_id.id
             self.title = self.sale_id.s_title
             return
+        CurrentValues.sale_id = False
         self.vip_customer = False
         self.partner_id = False
         self.title = False
