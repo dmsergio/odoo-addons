@@ -9,7 +9,8 @@
     "depends": [
         "product",
         "sale",
-        "sales_team"
+        "sales_team",
+        "mejisa"
     ],
     "data": [
         'data/manual_product_template.xml',

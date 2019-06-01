@@ -11,12 +11,16 @@
             <group>
               <group>
                 <field name="has_work_order_quantity_ids" invisible="1"/>
-                <field name="partner_id"/>
-                <field name="sale_id"
-                       options="{'no_create': True}"
-                       attrs="{'readonly': [('has_work_order_quantity_ids', '=', True)]}"/>
-                <field name="product_id" options="{'no_create': True}"/>
+                <field name="product_id"
+                       attrs="{
+                        'readonly': [('has_work_order_quantity_ids', '=', True)],
+                        'required': [('has_work_order_quantity_ids', '=', False)]}"
+                       options="{'no_create': True}"/>
                 <field name="type_working_day"/>
+                <field name="title" attrs="{'invisible': [('sale_id', '=', False)]}"/>
+                <field name="partner_id" attrs="{'invisible': [('sale_id', '=', False)]}"/>
+                <field name="sale_id"
+                       options="{'no_create': True}"/>
               </group>
               <group>
                 <field name="vip_customer"/>
@@ -26,8 +30,8 @@
               </group>
             </group>
             <group attrs="{'invisible': [('sale_id', '=', False)]}">
-              <group>
-                <field name="work_order_quantity_ids">
+              <group string="Tiempos en Puesto de Trabajo">
+                <field name="work_order_quantity_ids" nolabel="1">
                   <tree editable="top">
                     <field name="product_id"/>
                     <field name="product_qty"/>
@@ -38,17 +42,20 @@
               <group>
                 <button name="create_impute_to_sale" string="Aplicar" type="object"/>
               </group>
+              <group/>
             </group>
-            <group>
+            <group string="Líneas del operario" attrs="{'invisible': [('product_id', '=', False)]}">
               <field name="sale_order_line_ids"
                      readonly="1"
-                     attrs="{'invisible': [('sale_id', '=', False)]}">
+                     nolabel="1">
                 <tree default_order="order_date desc">
+                  <field name="order_id"/>
                   <field name="product_id"/>
                   <field name="name"/>
                   <field name="product_uom_qty"/>
                   <field name="product_uom"/>
                   <field name="order_date"/>
+                  <field name="type_working_day"/>
                   <field name="price_unit"/>
                   <field name="price_subtotal"/>
                 </tree>
