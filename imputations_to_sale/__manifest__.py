@@ -2,7 +2,7 @@
 {
     "name": "Imputations To Sales",
     "version": "10.0.0.0.5",
-    "author": "Sergio Díaz",
+    "author": "Sergio Díaz & Jesús Ndong",
     "category": "Human Resources",
     "website": "",
     "summary": "Impute employee costs to sale orders",
