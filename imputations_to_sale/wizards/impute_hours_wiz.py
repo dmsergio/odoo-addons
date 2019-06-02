@@ -57,13 +57,13 @@ class ImputeHoursWiz(models.TransientModel):
 
     total_hours = fields.Float(
         string="Total de horas",
-        help="Total de horas registradas en el pedido de venta seleccionado.",
+        help="Total de horas imputadas por el operario y fecha seleccionados.",
         readonly=True)
 
     subtotal = fields.Float(
         string="Subtotal",
         help="Subtotal calculado teniendo en cuenta el registro de tiempos del "
-             "pedido de venta seleccionado.",
+             "operario y fecha indicados.",
         readonly=True)
 
     work_order_quantity_ids = fields.One2many(
