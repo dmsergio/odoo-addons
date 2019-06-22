@@ -32,14 +32,12 @@ class ImputeHoursWiz(models.TransientModel):
         string="Cantidad")
 
     order_date = fields.Date(
-        string="Fecha",
-        default=datetime.datetime.now().date())
+        string="Fecha")
 
     partner_id = fields.Many2one(comodel_name="res.partner",
                                  string="Cliente",
                                  readonly=True)
     s_title = fields.Char(string="Title", readonly=True)
-    
 
     def create_impute_to_sale(self):
         order_id = self.sale_id
@@ -48,13 +46,26 @@ class ImputeHoursWiz(models.TransientModel):
         product_uom_qty = self.quantity
         order_date = self.order_date
         price_unit = product_id.list_price
-        self.env["sale.order.line"].create({
-            "order_id": order_id.id,
-            "product_id": product_id.id,
-            "product_uom": product_uom.id or False,
-            "product_uom_qty": product_uom_qty,
-            "price_unit": price_unit,
-            "order_date": order_date})
+        if self.sale_id.order_line:
+            for line in self.sale_id.order_line:
+                if line.product_id.id == product_id.id:
+                    line.product_uom_qty += product_uom_qty
+                else:
+                    self.env["sale.order.line"].create({
+                        "order_id": order_id.id,
+                        "product_id": product_id.id,
+                        "product_uom": product_uom.id or False,
+                        "product_uom_qty": product_uom_qty,
+                        "price_unit": price_unit,
+                        "order_date": order_date})
+        else:
+            self.env["sale.order.line"].create({
+                "order_id": order_id.id,
+                "product_id": product_id.id,
+                "product_uom": product_uom.id or False,
+                "product_uom_qty": product_uom_qty,
+                "price_unit": price_unit,
+                "order_date": order_date})
         context = self.env.context.copy()
         context["default_sale_id"] = self.sale_id.id
         return {
@@ -64,7 +75,6 @@ class ImputeHoursWiz(models.TransientModel):
             'view_type': 'form',
             'view_mode': 'form',
             'target': 'inline'}
-
 
     @api.onchange('product_id')
     def onchange_product_id(self):
