@@ -8,6 +8,7 @@
     "summary": "Impute employee costs to sale orders",
     "depends": [
         "product",
+        "l10n_es",
         "sale",
         "sales_team",
         "mejisa"
