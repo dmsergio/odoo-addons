@@ -11,14 +11,16 @@
     <field name="uom_id" ref="product.product_uom_unit"/>
     <field name="uom_po_id" ref="product.product_uom_unit"/>
   </record>
+
   <record model="product.template" id="product_template_000_00_0000">
-    <field name="name">000 00 0000</field>
+    <field name="name">COMPENSADOR ALBARÁN</field>
     <field name="type">service</field>
-    <field name="default_code">002</field>
+    <field name="default_code">0000 00 0000</field>
     <field name="sale_ok">True</field>
     <field name="purchase_ok">False</field>
     <field name="categ_id" ref="product.product_category_all"/>
     <field name="uom_id" ref="product.product_uom_unit"/>
+    <field name="texes_id" ref="l10n_es.1_account_tax_template_s_iva0"/>
     <field name="uom_po_id" ref="product.product_uom_unit"/>
   </record>
 

@@ -9,34 +9,48 @@ class SaleOrder(models.Model):
 
     _inherit = 'sale.order'
 
-
     global_price = fields.Float(string="Precio Global")
 
-    global_price_stored = fields.Float(string="Precio Global stored",
-                                compute="_prepare_compensator_order_line")
+    @api.model
+    def create(self, values):
+        sale_id = super(SaleOrder, self).create(values)
+        self._prepare_compensator_order_line(sale_id)
+        return sale_id
 
-    @api.multi
-    @api.depends('order_line')
-    def _prepare_compensator_order_line(self):
-        self.ensure_one()
-        order_line_ids= []
+    @api.one
+    def write(self, values):
+        res = super(SaleOrder, self).write(values)
+        sale_id = self
+        self._prepare_compensator_order_line(sale_id)
+        return res
+
+    def _prepare_compensator_order_line(self, sale_id):
+        sale_id.ensure_one()
         product_id = \
             self.env.ref("imputations_to_sale."
                          "product_template_000_00_0000")
-        order_id = self.id
-        if self.order_line and self.global_price:
-            order_line_ids = [i for i in self.order_line]
-            compnesator = self.global_price - self.amount_total
-            vals = {
-                'order_id': order_id,
-                'product_id': product_id.id,
-                'price_unit': compnesator,
-                'product_uom': product_id.uom_id.id,
-                'product_uom_qty': 1,
-                'name': product_id.name
-            }
-            line_id = self.env['sale.order.line'].create(vals)
-            order_line_ids.append(line_id)
-
-        #self.order_line = [(6, 0, order_line_ids)]
+        if sale_id.order_line and sale_id.global_price:
+            if product_id.id in sale_id.order_line.mapped("product_id").ids:
+                line_ids = sale_id.order_line.filtered(
+                    lambda x: x.product_id.id != product_id.id)
+                total_amount = 0
+                for line_id in line_ids:
+                    iva = line_id.price_subtotal * (line_id.tax_id.amount /100)
+                    subtotal_price = line_id.price_subtotal + iva
+                    total_amount += subtotal_price
+                amount_compensator = \
+                    sale_id.global_price - total_amount
+                line_id = sale_id.order_line.filtered(
+                    lambda x: x.product_id.id == product_id.id)
+                line_id.write({"price_unit": amount_compensator})
+            else:
+                amount_compensator = sale_id.global_price - sale_id.amount_total
+                values = {
+                    'order_id': sale_id.id,
+                    'product_id': product_id.id,
+                    'price_unit': amount_compensator,
+                    'product_uom': product_id.uom_id.id,
+                    'product_uom_qty': 1,
+                    'name': product_id.name}
+                self.env['sale.order.line'].create(values)
         return True
