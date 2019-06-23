@@ -17,6 +17,7 @@ class ImputeHoursWiz(models.TransientModel):
         domain="[('state', '!=', 'cancel'),"
                "('invoice_status', '!=', 'invoiced')]",
         required=True)
+
     sale_order_line_ids = fields.Many2many(
         comodel_name="sale.order.line",
         string="Líneas del pedido")
@@ -34,9 +35,11 @@ class ImputeHoursWiz(models.TransientModel):
     order_date = fields.Date(
         string="Fecha")
 
-    partner_id = fields.Many2one(comodel_name="res.partner",
-                                 string="Cliente",
-                                 readonly=True)
+    partner_id = fields.Many2one(
+        comodel_name="res.partner",
+        string="Cliente",
+        readonly=True)
+
     s_title = fields.Char(string="Title", readonly=True)
 
     def create_impute_to_sale(self):
@@ -46,18 +49,10 @@ class ImputeHoursWiz(models.TransientModel):
         product_uom_qty = self.quantity
         order_date = self.order_date
         price_unit = product_id.list_price
-        if self.sale_id.order_line:
-            for line in self.sale_id.order_line:
-                if line.product_id.id == product_id.id:
-                    line.product_uom_qty += product_uom_qty
-                else:
-                    self.env["sale.order.line"].create({
-                        "order_id": order_id.id,
-                        "product_id": product_id.id,
-                        "product_uom": product_uom.id or False,
-                        "product_uom_qty": product_uom_qty,
-                        "price_unit": price_unit,
-                        "order_date": order_date})
+        if product_id.id in order_id.order_line.mapped("product_id").ids:
+            line_id = order_id.order_line.filtered(
+                lambda x: x.product_id.id == product_id.id)
+            line_id.product_uom_qty += product_uom_qty
         else:
             self.env["sale.order.line"].create({
                 "order_id": order_id.id,
@@ -66,6 +61,7 @@ class ImputeHoursWiz(models.TransientModel):
                 "product_uom_qty": product_uom_qty,
                 "price_unit": price_unit,
                 "order_date": order_date})
+        self.env["sale.order"]._prepare_compensator_order_line(order_id)
         context = self.env.context.copy()
         context["default_sale_id"] = self.sale_id.id
         return {
@@ -88,7 +84,6 @@ class ImputeHoursWiz(models.TransientModel):
         return {
             "domain": {
                 "product_id": [("id", "in", product_ids.ids)]}}
-
 
     @api.onchange('sale_id')
     def onchange_sale_id(self):

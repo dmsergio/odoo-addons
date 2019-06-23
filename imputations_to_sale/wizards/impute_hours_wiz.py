@@ -52,8 +52,7 @@ class ImputeHoursWiz(models.TransientModel):
         readonly=True)
 
     order_date = fields.Date(
-        string="Fecha",
-        default=datetime.datetime.now().date())
+        string="Fecha")
 
     total_hours = fields.Float(
         string="Total de horas",
@@ -101,7 +100,11 @@ class ImputeHoursWiz(models.TransientModel):
             CurrentValues.product_id)
         product_qty = sum(self.work_order_quantity_ids.mapped("product_qty"))
         price_unit = self.get_price_unit(product_id)
+        # recalcular el importe de la línea compensatoria
         self.create_sale_order_line(product_id, product_qty, price_unit)
+        sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
+        sale_id._prepare_compensator_order_line(sale_id)
+        # preparar context y mostrar de nuevo el wizard
         context = self.env.context.copy()
         context["default_product_id"] = product_id.id
         context["default_order_date"] = self.order_date
@@ -256,4 +259,3 @@ class WorkOrderQuantityWiz(models.TransientModel):
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
-
