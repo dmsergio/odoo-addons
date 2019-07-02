@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_mejisa_product_pricelist_tree">
+            <field name="name">view.mejisa.product.pricelist.tree</field>
+            <field name="model">mejisa.product.pricelist</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <tree string="Tarifas Especiales">
+                    <field name="amount_1"/>
+                    <field name="amount_2"/>
+                    <field name="increase"/>
+                    <field name="decrease"/>
+               </tree>
+            </field>
+        </record>
+
+         <record id="action_mejisa_product_pricelist" model="ir.actions.act_window">
+          <field name="name">Tarifas especiales mejisa</field>
+          <field name="res_model">mejisa.product.pricelist</field>
+          <field name="view_type">tree</field>
+          <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem
+        id="menu_mejisa_product_pricelist"
+        parent="sale.menu_product_pricelist_main"
+        action="action_mejisa_product_pricelist"
+        sequence="10"
+        />
+</odoo>
