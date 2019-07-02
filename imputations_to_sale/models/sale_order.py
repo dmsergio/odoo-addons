@@ -15,6 +15,8 @@ class SaleOrder(models.Model):
     def create(self, values):
         sale_id = super(SaleOrder, self).create(values)
         self._prepare_compensator_order_line(sale_id)
+        for order_line_id in sale_id.order_line:
+            order_line_id.recalculate_subtotal()
         return sale_id
 
     @api.one
@@ -22,6 +24,8 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).write(values)
         sale_id = self
         self._prepare_compensator_order_line(sale_id)
+        for order_line_id in self.order_line:
+            order_line_id.recalculate_subtotal()
         return res
 
     def _prepare_compensator_order_line(self, sale_id):
