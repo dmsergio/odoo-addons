@@ -21,7 +21,6 @@
       <field name="purchase_ok">False</field>
       <field name="categ_id" ref="product.product_category_all"/>
       <field name="uom_id" ref="product.product_uom_unit"/>
-      <field name="taxes_id" eval="[(4, ref('l10n_es.1_account_tax_template_s_iva0'))]"/>
       <field name="uom_po_id" ref="product.product_uom_unit"/>
     </record>
 

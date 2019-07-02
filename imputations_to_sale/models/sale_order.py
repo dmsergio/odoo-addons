@@ -33,18 +33,15 @@ class SaleOrder(models.Model):
             if product_id.id in sale_id.order_line.mapped("product_id").ids:
                 line_ids = sale_id.order_line.filtered(
                     lambda x: x.product_id.id != product_id.id)
-                total_amount = 0
-                for line_id in line_ids:
-                    iva = line_id.price_subtotal * (line_id.tax_id.amount /100)
-                    subtotal_price = line_id.price_subtotal + iva
-                    total_amount += subtotal_price
+                total_amount = sum(line_ids.mapped("price_subtotal"))
                 amount_compensator = \
                     sale_id.global_price - total_amount
                 line_id = sale_id.order_line.filtered(
                     lambda x: x.product_id.id == product_id.id)
                 line_id.write({"price_unit": amount_compensator})
             else:
-                amount_compensator = sale_id.global_price - sale_id.amount_total
+                amount_compensator = \
+                    sale_id.global_price - sale_id.amount_untaxed
                 values = {
                     'order_id': sale_id.id,
                     'product_id': product_id.id,
