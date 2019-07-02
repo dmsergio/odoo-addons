@@ -11,6 +11,9 @@ class ResPartner(models.Model):
     partner_vip = fields.Boolean(
         string="Cliente VIP?")
 
+    reduced_rate = fields.Boolean(
+        string="Tarifa reducida")
+
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         args = args or []
