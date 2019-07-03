@@ -14,6 +14,8 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, values):
         sale_id = super(SaleOrder, self).create(values)
+        for order_line_id in sale_id.order_line:
+            order_line_id.recalculate_subtotal()
         self._prepare_compensator_order_line(sale_id)
         return sale_id
 
@@ -21,6 +23,8 @@ class SaleOrder(models.Model):
     def write(self, values):
         res = super(SaleOrder, self).write(values)
         sale_id = self
+        for order_line_id in self.order_line:
+            order_line_id.recalculate_subtotal()
         self._prepare_compensator_order_line(sale_id)
         return res
 
@@ -50,4 +54,9 @@ class SaleOrder(models.Model):
                     'product_uom_qty': 1,
                     'name': product_id.name}
                 self.env['sale.order.line'].create(values)
+        elif sale_id.order_line and sale_id.global_price == 0:
+            if product_id.id in sale_id.order_line.mapped("product_id").ids:
+                line_id = sale_id.order_line.filtered(
+                    lambda x: x.product_id.id == product_id.id)
+                line_id.unlink()
         return True

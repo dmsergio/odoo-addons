@@ -61,6 +61,8 @@ class ImputeHoursWiz(models.TransientModel):
                 "product_uom_qty": product_uom_qty,
                 "price_unit": price_unit,
                 "order_date": order_date})
+        for order_line_id in order_id.order_line:
+            order_line_id.recalculate_subtotal()
         self.env["sale.order"]._prepare_compensator_order_line(order_id)
         context = self.env.context.copy()
         context["default_sale_id"] = self.sale_id.id
