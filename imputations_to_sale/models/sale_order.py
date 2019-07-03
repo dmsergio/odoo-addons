@@ -54,4 +54,9 @@ class SaleOrder(models.Model):
                     'product_uom_qty': 1,
                     'name': product_id.name}
                 self.env['sale.order.line'].create(values)
+        elif sale_id.order_line and sale_id.global_price == 0:
+            if product_id.id in sale_id.order_line.mapped("product_id").ids:
+                line_id = sale_id.order_line.filtered(
+                    lambda x: x.product_id.id == product_id.id)
+                line_id.unlink()
         return True
