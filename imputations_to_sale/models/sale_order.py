@@ -14,18 +14,18 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, values):
         sale_id = super(SaleOrder, self).create(values)
-        self._prepare_compensator_order_line(sale_id)
         for order_line_id in sale_id.order_line:
             order_line_id.recalculate_subtotal()
+        self._prepare_compensator_order_line(sale_id)
         return sale_id
 
     @api.one
     def write(self, values):
         res = super(SaleOrder, self).write(values)
         sale_id = self
-        self._prepare_compensator_order_line(sale_id)
         for order_line_id in self.order_line:
             order_line_id.recalculate_subtotal()
+        self._prepare_compensator_order_line(sale_id)
         return res
 
     def _prepare_compensator_order_line(self, sale_id):

@@ -27,13 +27,45 @@ class SaleOrder(models.Model):
         default="regular")
 
     def recalculate_subtotal(self):
-        pricelist_obj = self.env["mejisa.product.pricelist"]
-        pricelist_id = pricelist_obj.search([
-            ("amount_1", "<=" , self.price_subtotal),
-            ("amount_2", ">=" , self.price_subtotal)],limit=1)
-        if pricelist_id:
-            increase = pricelist_id.increase
-            if self.order_id.partner_id.reduced_rate:
-                increase -= pricelist_id.decrease
-            self.price_subtotal += (self.price_subtotal * increase) / 100
+        # OPERARIOS
+        operator_category_ids = self.get_operator_category()
+        operator_product_ids = self.env["product.template"].search([
+            ("categ_id", "in", operator_category_ids)]).mapped(
+            "product_variant_id")
+
+        # PUESTO DE TRABAJO
+        machine_product_ids = self.get_machine_category()
+        machine_product_ids = self.env["product.template"].search([
+            ("categ_id", "in", machine_product_ids)]).mapped(
+            "product_variant_id")
+
+        product_ids = operator_product_ids.ids + machine_product_ids.ids
+        product_ids.append(self.env.ref(
+            "imputations_to_sale.product_template_0000_00_0000").\
+                           product_variant_id.id)
+
+        if self.product_id.id not in product_ids:
+            subtotal = self.price_unit * self.product_uom_qty
+            pricelist_obj = self.env["mejisa.product.pricelist"]
+            pricelist_id = pricelist_obj.search([
+                ("amount_1", "<=" , subtotal),
+                ("amount_2", ">=" , subtotal)],limit=1)
+            if pricelist_id:
+                increase = pricelist_id.increase
+                if self.order_id.partner_id.reduced_rate:
+                    increase -= pricelist_id.decrease
+                self.price_subtotal = subtotal + (subtotal * increase) / 100
+                self.price_total = self.price_subtotal + (
+                        self.price_subtotal * self.tax_id.amount) / 100
         return
+
+    def get_parent_operator_category(self):
+        return self.env["product.category"].browse(769).id
+
+    def get_operator_category(self):
+        parent_category_id = self.get_parent_operator_category()
+        return self.env["product.category"].search([
+            ("parent_id", "=", parent_category_id)]).ids
+
+    def get_machine_category(self):
+        return self.env["product.category"].browse(770).ids
