@@ -45,15 +45,15 @@ class SaleOrder(models.Model):
                            product_variant_id.id)
 
         if self.product_id.id not in product_ids:
-            subtotal = self.price_unit * self.product_uom_qty
+            subtotal = self.purchase_price * self.product_uom_qty
             pricelist_obj = self.env["mejisa.product.pricelist"]
             pricelist_id = pricelist_obj.search([
                 ("amount_1", "<=" , subtotal),
                 ("amount_2", ">=" , subtotal)],limit=1)
             if pricelist_id:
                 increase = pricelist_id.increase
-                if self.order_id.partner_id.reduced_rate:
-                    increase -= pricelist_id.decrease
+                increase -= pricelist_id.decrease if \
+                    self.order_id.partner_id.reduced_rate else 0
                 self.price_subtotal = subtotal + (subtotal * increase) / 100
                 self.price_total = self.price_subtotal + (
                         self.price_subtotal * self.tax_id.amount) / 100
