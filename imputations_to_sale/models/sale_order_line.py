@@ -2,7 +2,7 @@
 # © 2019 Sergio Díaz (<sdimar@yahoo.com>).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models, fields, api
+from odoo import models, fields
 import datetime
 
 
@@ -54,9 +54,8 @@ class SaleOrder(models.Model):
                 increase = pricelist_id.increase
                 increase -= pricelist_id.decrease if \
                     self.order_id.partner_id.reduced_rate else 0
-                self.price_subtotal = subtotal + (subtotal * increase) / 100
-                self.price_total = self.price_subtotal + (
-                        self.price_subtotal * self.tax_id.amount) / 100
+                self.price_unit = \
+                    self.purchase_price + (self.purchase_price * increase) / 100
         return
 
     def get_parent_operator_category(self):
