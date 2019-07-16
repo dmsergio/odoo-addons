@@ -214,9 +214,10 @@ class ImputeHoursWiz(models.TransientModel):
         :param line_ids: sale.order.line().
         :return: None
         """
-        self.total_hours = sum(line_ids.filtered(
-            lambda x: x.product_id.id == self.product_id.id).mapped(
-            "product_uom_qty"))
+        product_id = self.product_id.product_variant_id
+        self.total_hours = \
+            sum(line_ids.filtered(lambda x: x.product_id.id == product_id.id).\
+                mapped("product_uom_qty"))
         self.subtotal = sum(line_ids.mapped("price_subtotal"))
         return
 
