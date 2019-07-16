@@ -125,9 +125,9 @@ class ImputeHoursWiz(models.TransientModel):
             CurrentValues.product_id)
         line_values = {
             "order_id": sale_id.id,
-            "product_id": product_id.id,
+            "product_id": product_id.product_variant_id.id,
             "operator_product_id": operator_product_id.id,
-            "product_uom": product_id.uom_id.id,
+            "product_uom": product_id.product_variant_id.uom_id.id,
             "product_uom_qty": product_qty,
             "type_working_day": self.type_working_day,
             "price_unit": price_unit,
