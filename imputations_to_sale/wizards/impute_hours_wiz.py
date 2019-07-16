@@ -241,12 +241,6 @@ class ImputeHoursWiz(models.TransientModel):
                 sum_hours = sum(order_line_ids.filtered(lambda r:
                                                      r.product_id.uom_id.id == uom_hour.id).mapped("product_uom_qty"))
                 self.sale_hours = sum_hours
-                print("cooooorecto")
-
-
-
-
-
 
     @api.onchange("work_order_quantity_ids")
     def onchange_work_order_quantity_ids(self):
