@@ -25,8 +25,9 @@
               <group>
                 <field name="vip_customer"/>
                 <field name="order_date"/>
-                <field name="total_hours"/>
+                <field name="sale_hours"/>
                 <field name="subtotal" widget="monetary"/>
+                <field name="total_hours"/>
               </group>
             </group>
             <group attrs="{'invisible': [('sale_id', '=', False)]}">
