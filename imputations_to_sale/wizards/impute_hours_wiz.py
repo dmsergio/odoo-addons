@@ -55,8 +55,14 @@ class ImputeHoursWiz(models.TransientModel):
         string="Fecha")
 
     total_hours = fields.Float(
-        string="Total de horas",
+        string="Total de horas operario",
         help="Total de horas imputadas por el operario y fecha seleccionados.",
+        readonly=True)
+
+    sale_hours = fields.Float(
+        string="Total de horas pedido",
+        help="Total de horas imputadas del pedido de venta seleccionado.",
+        compute="_compute_total_sale_hours",
         readonly=True)
 
     subtotal = fields.Float(
@@ -220,6 +226,21 @@ class ImputeHoursWiz(models.TransientModel):
                 mapped("product_uom_qty"))
         self.subtotal = sum(line_ids.mapped("price_subtotal"))
         return
+
+    @api.depends('sale_id')
+    def _compute_total_sale_hours(self):
+        """
+        Esta función suma las horas invertidas en las líneas del pedido
+        realacionado.
+        :return:
+        """
+        uom_hour = self.env.ref("product.product_uom_hour")
+        if self.sale_id:
+            order_line_ids = self.sale_id.order_line
+            if order_line_ids:
+                sum_hours = sum(order_line_ids.filtered(lambda r:
+                                                     r.product_id.uom_id.id == uom_hour.id).mapped("product_uom_qty"))
+                self.sale_hours = sum_hours
 
     @api.onchange("work_order_quantity_ids")
     def onchange_work_order_quantity_ids(self):
