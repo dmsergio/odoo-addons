@@ -55,35 +55,35 @@
       <field name="amount_1">50.01</field>
       <field name="amount_2">100.00</field>
       <field name="increase">50</field>
-      <field name="decrease">0</field>
+      <field name="decrease">50</field>
     </record>
 
     <record model="mejisa.product.pricelist" id="mejisa_pricelist_09">
       <field name="amount_1">100.01</field>
       <field name="amount_2">300</field>
       <field name="increase">40</field>
-      <field name="decrease">0</field>
+      <field name="decrease">40</field>
     </record>
 
     <record model="mejisa.product.pricelist" id="mejisa_pricelist_10">
       <field name="amount_1">300.01</field>
       <field name="amount_2">600.00</field>
       <field name="increase">30</field>
-      <field name="decrease">0</field>
+      <field name="decrease">30</field>
     </record>
 
     <record model="mejisa.product.pricelist" id="mejisa_pricelist_11">
       <field name="amount_1">600.01</field>
       <field name="amount_2">3000.00</field>
       <field name="increase">20</field>
-      <field name="decrease">0</field>
+      <field name="decrease">20</field>
     </record>
 
     <record model="mejisa.product.pricelist" id="mejisa_pricelist_12">
       <field name="amount_1">3000.01</field>
       <field name="amount_2">99999.0</field>
       <field name="increase">15</field>
-      <field name="decrease">0</field>
+      <field name="decrease">15</field>
     </record>
 
   </data>

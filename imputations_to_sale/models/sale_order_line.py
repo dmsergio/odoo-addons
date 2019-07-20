@@ -51,9 +51,9 @@ class SaleOrder(models.Model):
                 ("amount_1", "<=" , subtotal),
                 ("amount_2", ">=" , subtotal)],limit=1)
             if pricelist_id:
-                increase = pricelist_id.increase
-                increase -= pricelist_id.decrease if \
-                    self.order_id.partner_id.reduced_rate else 0
+                increase = pricelist_id.increase if not \
+                    self.order_id.partner_id.reduced_rate else \
+                    pricelist_id.decrease
                 self.price_unit = \
                     self.purchase_price + (self.purchase_price * increase) / 100
         return
