@@ -32,9 +32,6 @@ class ImputeHoursWiz(models.TransientModel):
     quantity = fields.Float(
         string="Cantidad")
 
-    order_date = fields.Date(
-        string="Fecha")
-
     partner_id = fields.Many2one(
         comodel_name="res.partner",
         string="Cliente",
@@ -47,7 +44,6 @@ class ImputeHoursWiz(models.TransientModel):
         product_id = self.product_id.product_variant_id
         product_uom = product_id.uom_id
         product_uom_qty = self.quantity
-        order_date = self.order_date
         price_unit = product_id.list_price
         if product_id.id in order_id.order_line.mapped("product_id").ids:
             line_id = order_id.order_line.filtered(
@@ -59,8 +55,7 @@ class ImputeHoursWiz(models.TransientModel):
                 "product_id": product_id.id,
                 "product_uom": product_uom.id or False,
                 "product_uom_qty": product_uom_qty,
-                "price_unit": price_unit,
-                "order_date": order_date})
+                "price_unit": price_unit})
         for order_line_id in order_id.order_line:
             order_line_id.recalculate_subtotal()
         self.env["sale.order"]._prepare_compensator_order_line(order_id)

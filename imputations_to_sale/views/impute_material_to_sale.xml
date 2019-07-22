@@ -16,7 +16,6 @@
                        domain="[('type', '=','product')]" options="{'no_create': True}"
                        default_focus="1"/>
                 <field name="quantity"/>
-                <field name="order_date"/>
               </group>
               <group>
               </group>
@@ -33,7 +32,6 @@
                   <field name="name"/>
                   <field name="product_uom_qty"/>
                   <field name="product_uom"/>
-                  <field name="order_date"/>
                   <field name="price_unit"/>
                   <field name="price_subtotal"/>
                 </tree>
