@@ -22,10 +22,11 @@ class SaleOrder(models.Model):
     @api.one
     def write(self, values):
         res = super(SaleOrder, self).write(values)
-        sale_id = self
-        for order_line_id in self.order_line:
-            order_line_id.recalculate_subtotal()
-        self._prepare_compensator_order_line(sale_id)
+        if not self.state == "done":
+            sale_id = self
+            for order_line_id in self.order_line:
+                order_line_id.recalculate_subtotal()
+            self._prepare_compensator_order_line(sale_id)
         return res
 
     def _prepare_compensator_order_line(self, sale_id):
