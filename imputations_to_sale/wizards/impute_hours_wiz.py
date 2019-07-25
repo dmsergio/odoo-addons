@@ -52,7 +52,8 @@ class ImputeHoursWiz(models.TransientModel):
         readonly=True)
 
     order_date = fields.Date(
-        string="Fecha")
+        string="Fecha",
+        required=True)
 
     total_hours = fields.Float(
         string="Total de horas operario",
@@ -101,12 +102,12 @@ class ImputeHoursWiz(models.TransientModel):
             if work_order_quantity_id.product_id.id != manual_product_id.id:
                 product_id = work_order_quantity_id.product_id
                 product_qty = work_order_quantity_id.product_qty
-                price_unit = \
-                    self.get_price_unit(product_id, operator_product_id)
+                price_unit, cost_unit = \
+                    self.get_price(product_id, operator_product_id)
                 name = "{} - {}".format(
                     product_id.display_name, operator_product_id.name)
                 self.create_sale_order_line(
-                    product_id, product_qty, price_unit, name)
+                    product_id, product_qty, price_unit, cost_unit, name)
         sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
         sale_id._prepare_compensator_order_line(sale_id)
         # recalcular el subtotal en función de la tarifa
@@ -114,7 +115,7 @@ class ImputeHoursWiz(models.TransientModel):
             order_line_id.recalculate_subtotal()
         # preparar context y mostrar de nuevo el wizard
         context = self.env.context.copy()
-        context["default_product_id"] = product_id.id
+        context["default_product_id"] = operator_product_id.id
         context["default_order_date"] = self.order_date
         return {
             "type": "ir.actions.act_window",
@@ -124,7 +125,8 @@ class ImputeHoursWiz(models.TransientModel):
             "view_mode": "form",
             "target": "inline"}
 
-    def create_sale_order_line(self, product_id, product_qty, price_unit, name):
+    def create_sale_order_line(self, product_id, product_qty, price_unit,
+                               cost_unit, name):
         sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
         operator_product_id = self.env["product.template"].browse(
             CurrentValues.product_id)
@@ -137,16 +139,18 @@ class ImputeHoursWiz(models.TransientModel):
             "product_uom_qty": product_qty,
             "type_working_day": self.type_working_day,
             "price_unit": price_unit,
+            "purchase_price": cost_unit,
             "order_date": self.order_date}
         self.env["sale.order.line"].create(line_values)
 
-    def get_price_unit(self, product_id, operator_product_id):
+    def get_price(self, product_id, operator_product_id):
         """
-        Función para obtener el precio unitario de la línea del presupuesto
-        realizando la suma del precio de coste de la máquina y del operario.
+        Función para obtener el precio unitario y de coste de la línea del
+        presupuesto realizando la suma del precio de coste de la máquina y del
+        operario.
         :param product_id (product.template): máquina.
         :param operator_product_id (product.template): operario.
-        :return (float): price
+        :return (float): price and cost
         """
         parent_operator_category_id = self.get_parent_operator_category()
         sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
@@ -171,7 +175,8 @@ class ImputeHoursWiz(models.TransientModel):
                 price = operator_product_id.vip_night_holiday_price
         price += product_id.list_price if not sale_id.partner_id.partner_vip \
             else product_id.vip_price
-        return price
+        cost = product_id.standard_price + operator_product_id.standard_price
+        return price, cost
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
