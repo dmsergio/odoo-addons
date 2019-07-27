@@ -254,7 +254,7 @@ class ImputeHoursWiz(models.TransientModel):
         """
         product_id = self.product_id.product_variant_id
         self.total_hours = \
-            sum(line_ids.filtered(lambda x: x.product_id.id == product_id.id).\
+            sum(line_ids.filtered(lambda x: x.operator_product_id.id == product_id.id).\
                 mapped("product_uom_qty"))
         self.subtotal = sum(line_ids.mapped("price_subtotal"))
         return

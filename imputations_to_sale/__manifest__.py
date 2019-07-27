@@ -10,6 +10,7 @@
         "product",
         "l10n_es",
         "sale",
+        "sale_margin",
         "sales_team",
         "mejisa"
     ],
