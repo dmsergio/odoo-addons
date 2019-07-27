@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
         product_id = \
             self.env.ref("imputations_to_sale.product_template_0000_00_0000")
         product_id = product_id.product_variant_id
-        if sale_id.order_line and sale_id.global_price:
+        if sale_id.global_price:
             if product_id.id in sale_id.order_line.mapped("product_id").ids:
                 line_ids = sale_id.order_line.filtered(
                     lambda x: x.product_id.id != product_id.id)

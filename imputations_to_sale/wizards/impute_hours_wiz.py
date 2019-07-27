@@ -94,25 +94,43 @@ class ImputeHoursWiz(models.TransientModel):
             raise UserError(_(
                 "Por favor, indica los tiempos a registrar de los puestos de "
                 "trabajo. Gracias."))
+
+        # se busca el producto manual y el producto del operario
         manual_product_id = self.env.ref("imputations_to_sale.manual_product")
         operator_product_id = self.env["product.template"].browse(
             CurrentValues.product_id)
+
         # creación de las líneas del pedido de venta de los puestos de trabajo
         for work_order_quantity_id in self.work_order_quantity_ids:
             if work_order_quantity_id.product_id.id != manual_product_id.id:
+                # se crea la línea para la máquina y el operario
                 product_id = work_order_quantity_id.product_id
                 product_qty = work_order_quantity_id.product_qty
                 price_unit, cost_unit = \
-                    self.get_price(product_id, operator_product_id)
+                    self.get_price(operator_product_id, product_id)
                 name = "{} - {}".format(
                     product_id.display_name, operator_product_id.name)
                 self.create_sale_order_line(
                     product_id, product_qty, price_unit, cost_unit, name)
+            else:
+                # se crea la línea solo para el operario
+                operator_product_id = self.env["product.template"].browse(
+                    CurrentValues.product_id)
+                product_qty = work_order_quantity_id.product_qty
+                price_unit, cost_unit = self.get_price(operator_product_id)
+                name = operator_product_id.name
+                self.create_sale_order_line(
+                    operator_product_id, product_qty, price_unit, cost_unit,
+                    name)
+
+        # creación de la línea compensatoria
         sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
         sale_id._prepare_compensator_order_line(sale_id)
+
         # recalcular el subtotal en función de la tarifa
         for order_line_id in sale_id.order_line:
             order_line_id.recalculate_subtotal()
+
         # preparar context y mostrar de nuevo el wizard
         context = self.env.context.copy()
         context["default_product_id"] = operator_product_id.id
@@ -143,7 +161,7 @@ class ImputeHoursWiz(models.TransientModel):
             "order_date": self.order_date}
         self.env["sale.order.line"].create(line_values)
 
-    def get_price(self, product_id, operator_product_id):
+    def get_price(self, operator_product_id, product_id=False):
         """
         Función para obtener el precio unitario y de coste de la línea del
         presupuesto realizando la suma del precio de coste de la máquina y del
@@ -152,9 +170,7 @@ class ImputeHoursWiz(models.TransientModel):
         :param operator_product_id (product.template): operario.
         :return (float): price and cost
         """
-        parent_operator_category_id = self.get_parent_operator_category()
         sale_id = self.env["sale.order"].browse(CurrentValues.sale_id)
-        # if operator_product_id.categ_id.parent_id.id == parent_operator_category_id:
         if not sale_id.partner_id.partner_vip:
             if self.type_working_day == 'regular':
                 price = operator_product_id.list_price
@@ -173,10 +189,14 @@ class ImputeHoursWiz(models.TransientModel):
                 price = operator_product_id.vip_holiday_price
             else:
                 price = operator_product_id.vip_night_holiday_price
-        price += product_id.list_price if not sale_id.partner_id.partner_vip \
-            else product_id.vip_price
-        cost = product_id.standard_price + operator_product_id.standard_price
-        return price, cost
+        if product_id:
+            price += \
+                product_id.list_price if not sale_id.partner_id.partner_vip \
+                    else product_id.vip_price
+            cost = \
+                product_id.standard_price + operator_product_id.standard_price
+            return price, cost
+        return price, operator_product_id.standard_price
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
