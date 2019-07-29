@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import models, fields, api, _
-import datetime
 from odoo.exceptions import UserError
 
 
@@ -108,8 +107,8 @@ class ImputeHoursWiz(models.TransientModel):
                 product_qty = work_order_quantity_id.product_qty
                 price_unit, cost_unit = \
                     self.get_price(operator_product_id, product_id)
-                name = "{} - {}".format(
-                    product_id.display_name, operator_product_id.name)
+                name = ("%s - %s") % (product_id.display_name,
+                                      operator_product_id.name)
                 self.create_sale_order_line(
                     product_id, product_qty, price_unit, cost_unit, name)
             else:
@@ -253,9 +252,9 @@ class ImputeHoursWiz(models.TransientModel):
         :return: None
         """
         product_id = self.product_id.product_variant_id
-        self.total_hours = \
-            sum(line_ids.filtered(lambda x: x.operator_product_id.id == product_id.id).\
-                mapped("product_uom_qty"))
+        self.total_hours = sum(line_ids.filtered(
+            lambda x: x.operator_product_id.product_variant_id.id ==
+                      product_id.id).mapped("product_uom_qty"))
         self.subtotal = sum(line_ids.mapped("price_subtotal"))
         return
 
@@ -270,8 +269,9 @@ class ImputeHoursWiz(models.TransientModel):
         if self.sale_id:
             order_line_ids = self.sale_id.order_line
             if order_line_ids:
-                sum_hours = sum(order_line_ids.filtered(lambda r:
-                                                     r.product_id.uom_id.id == uom_hour.id).mapped("product_uom_qty"))
+                sum_hours = sum(order_line_ids.filtered(
+                    lambda r: r.product_id.uom_id.id == uom_hour.id).mapped(
+                    "product_uom_qty"))
                 self.sale_hours = sum_hours
 
     @api.onchange("work_order_quantity_ids")
