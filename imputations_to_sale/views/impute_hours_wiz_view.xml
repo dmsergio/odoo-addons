@@ -49,7 +49,7 @@
               <field name="sale_order_line_ids"
                      readonly="1"
                      nolabel="1">
-                <tree default_order="order_date desc">
+                <tree default_order="order_date, order_id asc">
                   <field name="order_id"/>
                   <field name="product_id"/>
                   <field name="name"/>
