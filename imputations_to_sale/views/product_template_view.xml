@@ -23,6 +23,9 @@
               <field name="regular_night_holiday_price" widget="monetary"
                      options="{'currency_field': 'currency_id'}"
                      attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="fixed_price" 
+                     attrs="{'invisible' : ['|', ('categ_labors', '=', True),
+                                                 ('categ_operators', '=', True)]}"/>
             </group>
             <group string="Clientes VIP"
                    attrs="{'invisible' : [('categ_labors', '=', False), ('categ_operators', '=', False)]}">

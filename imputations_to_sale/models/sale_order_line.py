@@ -44,7 +44,8 @@ class SaleOrder(models.Model):
             "imputations_to_sale.product_template_0000_00_0000").\
                            product_variant_id.id)
 
-        if self.product_id.id not in product_ids:
+        if self.product_id.id not in product_ids \
+                and not self.product_id.fixed_price:
             subtotal = self.purchase_price * self.product_uom_qty
             pricelist_obj = self.env["mejisa.product.pricelist"]
             pricelist_id = pricelist_obj.search([

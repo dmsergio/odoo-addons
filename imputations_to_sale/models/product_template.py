@@ -38,6 +38,9 @@ class ProductTemplate(models.Model):
         string="Operarios",
         compute='_compute_operators_categ_id')
 
+    fixed_price = fields.Boolean(string="Precio fijo")
+
+
     @api.one
     @api.depends('categ_id')
     def _compute_operators_categ_id(self):

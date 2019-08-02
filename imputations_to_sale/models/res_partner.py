@@ -19,8 +19,10 @@ class ResPartner(models.Model):
         args = args or []
         domain = []
         if name:
-            domain = ['|',
+            domain = ['|', '|',
                       ('name', operator, name),
-                      ('city', operator, name)]
+                      ('city', operator, name),
+                      ('ref', '=', name)
+                      ]
         partner_ids = self.search(domain + args, limit=limit)
         return partner_ids.name_get()

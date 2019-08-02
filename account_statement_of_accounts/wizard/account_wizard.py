@@ -78,7 +78,7 @@ class accountStatementAccountsWizard(models.TransientModel):
             'views': [(view_id.id, 'tree'), (False, 'form')],
             'context': ctx,
             'domain': domain,
-            'limit': 500,
+            'limit': 5000,
             'res_model': 'account.move.line',
             'type': 'ir.actions.act_window',
             'name': title}
