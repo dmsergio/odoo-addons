@@ -18,6 +18,7 @@
         'security/ir.model.access.csv',
         'data/manual_product_template.xml',
         'data/mejisa_product_pricelist_data.xml',
+        'views/account_invoice.xml',
         'views/product_template_view.xml',
         'views/sale_order_line.xml',
         'views/impute_hours_wiz_view.xml',

@@ -1,10 +1,35 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models
+from odoo import api, models, fields, _
 
 
 class AccountInvoice(models.Model):
-
     _inherit = 'account.invoice'
+
+    @api.multi
+    @api.depends('invoice_line_ids')
+    def _compute_amount(self):
+        # result = {}
+        sale_obj = self.env['sale.order']
+        sale_ids = sale_obj
+        if self.invoice_line_ids:
+            for recs in self.invoice_line_ids:
+                for line in recs.sale_line_ids:
+                    if not line.order_id in sale_ids:
+                        sale_ids |= line.order_id
+            if sale_ids:
+                self.sale_ids = [(6, 0, sale_ids.ids)]
+        return True
+
+    sale_ids = fields.Many2many(comodel_name="sale.order",
+                                relation="sale_order_invoice_rel",
+                                column1="invoice_order_id",
+                                column2="sale_order_id",
+                                string='Sale Orders',
+                                readonly=True,
+                                compute="_compute_amount",
+                                help="Estos son todos los "
+                                     "pedidos relacionados a la factura."
+                                )
 
     @api.multi
     def invoice_validate(self):
