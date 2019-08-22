@@ -13,9 +13,9 @@ class AccountInvoice(models.Model):
         sale_ids = sale_obj
         if self.invoice_line_ids:
             for recs in self.invoice_line_ids:
-                for line in recs.sale_line_ids:
-                    if not line.order_id in sale_ids:
-                        sale_ids |= line.order_id
+                order_id = recs.sale_line_ids.filtered(lambda x: x.order_id)
+                if not order_id.order_id in sale_ids:
+                    sale_ids |= order_id.order_id
             if sale_ids:
                 self.sale_ids = [(6, 0, sale_ids.ids)]
         return True
