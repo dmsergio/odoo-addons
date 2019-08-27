@@ -61,3 +61,11 @@ class SaleOrder(models.Model):
                     lambda x: x.product_id.id == product_id.id)
                 line_id.unlink()
         return True
+
+
+    def get_sale_order(self, lines):
+        order_id = False
+        if lines:
+            order_id = lines.filtered(lambda x: x.order_id)
+            order_id = self.search([('id', '=', order_id.order_id.id)], limit=1)
+            return order_id
