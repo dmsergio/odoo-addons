@@ -70,7 +70,7 @@ class AccountInvoice(models.Model):
         if self.origin:
             for recs in self.invoice_line_ids:
                 order_id = sale_obj.get_sale_order(recs.sale_line_ids)
-                sale_ids |= order_id
+                if order_id: sale_ids |= order_id
             if sale_ids:
                 self.sale_ids = [(6, 0, sale_ids.ids)]
         return True
