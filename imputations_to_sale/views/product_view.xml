@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+  <!--Product template-->
   <record id="product_template_list_prices_form_view" model="ir.ui.view">
     <field name="name">product_template_list_prices_form_view</field>
     <field name="model">product.template</field>
     <field name="inherit_id" ref="product.product_template_only_form_view"/>
     <field name="arch" type="xml">
-
       <field name="list_price" position="replace"/>
-
       <xpath expr="//page[@name='general_information']" position="after">
         <page name="prices" string="Precios de venta">
           <field name="categ_operators" invisible="1"/>
@@ -39,9 +38,50 @@
             </group>
           </group>
         </page>
-
       </xpath>
     </field>
   </record>
+
+  <!--Product product-->
+  <record id="product_product_list_prices_form_view" model="ir.ui.view">
+    <field name="name">product_product_list_prices_form_view</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="product.product_normal_form_view"/>
+    <field name="arch" type="xml">
+      <field name="lst_price" position="replace"/>
+      <xpath expr="//page[@name='general_information']" position="after">
+        <page name="prices" string="Precios de venta">
+          <field name="categ_operators" invisible="1"/>
+          <field name="categ_labors" invisible="1"/>
+          <group>
+            <group string="Clientes normales">
+              <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+              <field name="regular_night_price" widget="monetary" options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="regular_holiday_price" widget="monetary" options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="regular_night_holiday_price" widget="monetary"
+                     options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="fixed_price"
+                     attrs="{'invisible' : ['|', ('categ_labors', '=', True),
+                                                 ('categ_operators', '=', True)]}"/>
+            </group>
+            <group string="Clientes VIP"
+                   attrs="{'invisible' : [('categ_labors', '=', False), ('categ_operators', '=', False)]}">
+              <field name="vip_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+              <field name="vip_night_price" widget="monetary" options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="vip_holiday_price" widget="monetary" options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+              <field name="vip_night_holiday_price" widget="monetary" options="{'currency_field': 'currency_id'}"
+                     attrs="{'invisible' : [('categ_operators', '=', False)]}"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
 </odoo>
 
