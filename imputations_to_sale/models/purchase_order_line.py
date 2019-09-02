@@ -14,6 +14,14 @@ class PurchaseOrderLine(models.Model):
         help="Unidades reales en stock.",
         compute="_compute_stock_qty")
 
+    product_list_price_rel = fields.Float(
+        string="Precio de venta",
+        related="product_id.list_price",
+        readonly=True)
+
+    delivery_cost = fields.Float(
+        string="Portes")
+
     @api.one
     def _compute_stock_qty(self):
         stock_quant_obj = self.env["stock.quant"]

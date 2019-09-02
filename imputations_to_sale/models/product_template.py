@@ -127,3 +127,21 @@ class ProductTemplate(models.Model):
         if res and not values.get("list_price", False):
             self.recalculate_price_list(self)
         return res
+
+
+class ProductProduct(models.Model):
+
+    _inherit = 'product.product'
+
+    @api.model
+    def create(self, values):
+        product_id = super(ProductProduct, self).create(values)
+        self.env["product.template"].recalculate_price_list(product_id)
+        return product_id
+
+    @api.one
+    def write(self, values):
+        res = super(ProductProduct, self).write(values)
+        if res and not values.get("list_price", False):
+            self.env["product.template"].recalculate_price_list(self)
+        return res
