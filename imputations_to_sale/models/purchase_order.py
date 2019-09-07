@@ -35,7 +35,7 @@ class PurchaseOrder(models.Model):
             for line in order_line:
                 seller_ids = line.product_id.seller_ids
                 supplierinfo = \
-                    seller_ids.filtered(lambda x: x.name == partner_id.name)
+                    seller_ids.filtered(lambda x: x.name.name == partner_id.name)
                 if not supplierinfo:
                     supplierinfo_vals = {
                         'name': partner_id.id
