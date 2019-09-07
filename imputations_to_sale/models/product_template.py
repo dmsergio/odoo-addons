@@ -90,6 +90,8 @@ class ProductTemplate(models.Model):
         pricelists.
         :param product_id (product.template): product to recalculate its price
         """
+        if self.fixed_price:
+            return
         # OPERATORS
         operator_category_ids = self.get_operator_category()
         operator_product_ids = self.env["product.template"].search([
