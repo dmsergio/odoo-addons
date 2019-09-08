@@ -44,35 +44,10 @@ class ProductTemplate(models.Model):
     @api.one
     @api.depends('categ_id')
     def _compute_operators_categ_id(self):
-        """ Este método recalcula el precio de venta del producto,
-            y muestra la pestaña Precios de venta en función del
-            del tipo de categoria selseccionado por el usuario"""
-
-        # recalculates the price of sale of products
-        # OPERARIOS
-        operator_category_ids = self.get_operator_category()
-        operator_product_ids = self.env["product.template"].search([
-            ("categ_id", "in", operator_category_ids)]).mapped(
-            "product_variant_id")
-        # PUESTO DE TRABAJO
-        machine_product_ids = self.get_machine_category()
-        machine_product_ids = self.env["product.template"].search([
-            ("categ_id", "in", machine_product_ids)]).mapped(
-            "product_variant_id")
-        product_ids = operator_product_ids.ids + machine_product_ids.ids
-        product_ids.append(self.env.ref(
-            "imputations_to_sale.product_template_0000_00_0000"). \
-                           product_variant_id.id)
-        if self.id not in product_ids:
-            cost_price = self.standard_price
-            pricelist_obj = self.env["mejisa.product.pricelist"]
-            pricelist_id = pricelist_obj.search([
-                ("amount_1", "<=", cost_price),
-                ("amount_2", ">=", cost_price)], limit=1)
-            if pricelist_id:
-                increase = pricelist_id.increase
-                list_price = cost_price + (cost_price * increase) / 100
-                self.write({'list_price': list_price})
+        """
+        Muestra la pestaña Precios de venta en función del del tipo de
+        categoria seleccionado por el usuario
+        """
         machine_category_ids = self.get_machine_category()
         categ_obj = self.env['product.category']
         parent_category_id = categ_obj.browse(769).id
@@ -86,8 +61,6 @@ class ProductTemplate(models.Model):
         else:
             return False
         return True
-
-
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
@@ -110,3 +83,67 @@ class ProductTemplate(models.Model):
         parent_category_id = self.get_parent_operator_category()
         return self.env["product.category"].search([
             ("parent_id", "=", parent_category_id)]).ids
+
+    def recalculate_price_list(self, product_id):
+        """
+        Method to recalculate the product price list looking for in Mejisa
+        pricelists.
+        :param product_id (product.template): product to recalculate its price
+        """
+        if self.fixed_price:
+            return
+        # OPERATORS
+        operator_category_ids = self.get_operator_category()
+        operator_product_ids = self.env["product.template"].search([
+            ("categ_id", "in", operator_category_ids)]).mapped(
+            "product_variant_id")
+        # WORKPLACES
+        machine_product_ids = self.get_machine_category()
+        machine_product_ids = self.env["product.template"].search([
+            ("categ_id", "in", machine_product_ids)]).mapped(
+            "product_variant_id")
+        product_ids = operator_product_ids.ids + machine_product_ids.ids
+        product_ids.append(
+            self.env.ref("imputations_to_sale.product_template_0000_00_0000").
+                product_variant_id.id)
+        if product_id.product_variant_id.id not in product_ids:
+            cost_price = product_id.standard_price
+            pricelist_obj = self.env["mejisa.product.pricelist"]
+            pricelist_id = pricelist_obj.search([
+                ("amount_1", "<=", cost_price),
+                ("amount_2", ">=", cost_price)], limit=1)
+            if pricelist_id:
+                increase = pricelist_id.increase
+                list_price = cost_price + (cost_price * increase) / 100
+                product_id.write({'list_price': list_price})
+
+    @api.model
+    def create(self, values):
+        product_id = super(ProductTemplate, self).create(values)
+        self.recalculate_price_list(product_id)
+        return product_id
+
+    @api.one
+    def write(self, values):
+        res = super(ProductTemplate, self).write(values)
+        if res and not values.get("list_price", False):
+            self.recalculate_price_list(self)
+        return res
+
+
+class ProductProduct(models.Model):
+
+    _inherit = 'product.product'
+
+    @api.model
+    def create(self, values):
+        product_id = super(ProductProduct, self).create(values)
+        self.env["product.template"].recalculate_price_list(product_id)
+        return product_id
+
+    @api.one
+    def write(self, values):
+        res = super(ProductProduct, self).write(values)
+        if res and not values.get("list_price", False):
+            self.env["product.template"].recalculate_price_list(self)
+        return res

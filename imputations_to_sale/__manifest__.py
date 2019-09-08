@@ -12,6 +12,7 @@
         "sale",
         "sale_margin",
         "sales_team",
+        "purchase",
         "mejisa"
     ],
     "data": [
@@ -19,8 +20,9 @@
         'data/manual_product_template.xml',
         'data/mejisa_product_pricelist_data.xml',
         'views/account_invoice.xml',
-        'views/product_template_view.xml',
+        'views/product_view.xml',
         'views/sale_order_line.xml',
+        'views/purchase_order_line.xml',
         'views/impute_hours_wiz_view.xml',
         'views/impute_material_to_sale.xml',
         'views/res_partner_view.xml',
