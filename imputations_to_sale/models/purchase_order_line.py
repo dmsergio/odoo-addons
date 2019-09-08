@@ -29,3 +29,25 @@ class PurchaseOrderLine(models.Model):
         self.stock_qty = sum(stock_quant_obj.search([
             ("product_id", "=", self.product_id.id),
             ("location_id", "=", location_id.id)]).mapped("qty"))
+
+    @api.depends('product_qty', 'price_unit', 'taxes_id', 'delivery_cost')
+    def _compute_amount(self):
+        for line_id in self:
+            price_unit = line_id.price_unit
+            product_qty = line_id.product_qty
+            discount = line_id.discount
+            delivery_cost = line_id.delivery_cost
+            price_subtotal = \
+                price_unit * product_qty - ((price_unit * product_qty) *
+                                            (discount / 100)) + \
+                delivery_cost
+            price_total = \
+                price_subtotal + (price_subtotal * sum(
+                    line_id.taxes_id.mapped("amount")) / 100)
+            line_id.update({
+                "price_subtotal": price_subtotal,
+                "price_total": price_total,
+                "price_tax": price_total - price_subtotal})
+            line_id.price_subtotal = price_subtotal
+            line_id.price_total = price_total
+            line_id.price_tax = price_total - price_subtotal
