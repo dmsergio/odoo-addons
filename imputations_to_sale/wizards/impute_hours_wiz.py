@@ -127,8 +127,7 @@ class ImputeHoursWiz(models.TransientModel):
         sale_id._prepare_compensator_order_line(sale_id)
 
         # recalcular el subtotal en función de la tarifa
-        for order_line_id in sale_id.order_line:
-            order_line_id.recalculate_subtotal()
+        sale_id.order_line.recalculate_subtotal()
 
         # preparar context y mostrar de nuevo el wizard
         context = self.env.context.copy()

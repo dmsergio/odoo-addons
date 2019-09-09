@@ -44,19 +44,21 @@ class SaleOrder(models.Model):
             "imputations_to_sale.product_template_0000_00_0000").\
                            product_variant_id.id)
 
-        if self.product_id.id not in product_ids \
-                and not self.product_id.fixed_price:
-            subtotal = self.purchase_price * self.product_uom_qty
-            pricelist_obj = self.env["mejisa.product.pricelist"]
-            pricelist_id = pricelist_obj.search([
-                ("amount_1", "<=" , subtotal),
-                ("amount_2", ">=" , subtotal)],limit=1)
-            if pricelist_id:
-                increase = pricelist_id.increase if not \
-                    self.order_id.partner_id.reduced_rate else \
-                    pricelist_id.decrease
-                self.price_unit = \
-                    self.purchase_price + (self.purchase_price * increase) / 100
+        for record in self:
+            if record.product_id.id not in product_ids \
+                    and not record.product_id.fixed_price:
+                subtotal = record.purchase_price * record.product_uom_qty
+                pricelist_obj = self.env["mejisa.product.pricelist"]
+                pricelist_id = pricelist_obj.search([
+                    ("amount_1", "<=" , subtotal),
+                    ("amount_2", ">=" , subtotal)],limit=1)
+                if pricelist_id:
+                    increase = pricelist_id.increase if not \
+                        record.order_id.partner_id.reduced_rate else \
+                        pricelist_id.decrease
+                    record.price_unit = \
+                        record.purchase_price + (record.purchase_price *
+                                                 increase) / 100
         return
 
     def get_parent_operator_category(self):
