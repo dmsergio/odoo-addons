@@ -48,12 +48,6 @@ class AccountInvoice(models.Model):
 
         for line_id in line_ids:
             line_id.product_id.write({"standard_price": line_id.price_unit})
-            seller_ids = line_id.product_id.seller_ids
-            if seller_ids:
-                supplierinfo = \
-                    seller_ids.filtered(lambda x: x.name.id == self.partner_id.id)
-                if supplierinfo:
-                    supplierinfo.write({'price': line_id.price_unit})
         return
 
     def get_parent_operator_category(self):

@@ -50,3 +50,26 @@ class PurchaseOrder(models.Model):
                         obj_prodsupplierinfo.create(supplierinfo_vals)
                     line.product_id.seller_ids = [(4, supplierinfo_id.id)]
             return True
+
+    @api.multi
+    def button_confirm(self):
+        super(PurchaseOrder, self).button_confirm()
+        self.update_product_supplier_cost(self.partner_id, self.order_line)
+        return True
+
+
+    def update_product_supplier_cost(self, partner_id, order_line):
+        ''' Update product supplier cost
+        :param partner_id:
+        :param order_line:
+        :return:
+        '''
+        if partner_id and order_line:
+            for line_id in order_line:
+                seller_ids = line_id.product_id.seller_ids
+                if seller_ids:
+                    supplierinfo = \
+                        seller_ids.filtered(
+                            lambda x: x.name.id == partner_id.id)
+                    if supplierinfo:
+                        supplierinfo.write({'price': line_id.price_unit})
