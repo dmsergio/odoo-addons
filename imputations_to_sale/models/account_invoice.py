@@ -5,17 +5,15 @@ from odoo import api, models, fields, _
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-
-    sale_ids = fields.Many2many(comodel_name="sale.order",
-                                relation="sale_order_invoice_rel",
-                                column1="invoice_order_id",
-                                column2="sale_order_id",
-                                string='Sale Orders',
-                                readonly=True,
-                                compute="_get_sale_order_from_invoice_line",
-                                help="Estos son todos los "
-                                     "pedidos relacionados a la factura."
-                                )
+    sale_ids = fields.Many2many(
+        comodel_name="sale.order",
+        relation="sale_order_invoice_rel",
+        column1="invoice_order_id",
+        column2="sale_order_id",
+        string='Sale Orders',
+        readonly=True,
+        compute="_get_sale_order_from_invoice_line",
+        help="Estos son todos los pedidos relacionados a la factura.")
 
     @api.multi
     def invoice_validate(self):
@@ -74,3 +72,26 @@ class AccountInvoice(models.Model):
             if sale_ids:
                 self.sale_ids = [(6, 0, sale_ids.ids)]
         return True
+
+    @api.model
+    def create(self, values):
+        invoice_id = super(AccountInvoice, self).create(values)
+        invoice_id.recalculate_tax_lines()
+        return invoice_id
+    
+    @api.one
+    def write(self, values):
+        result = super(AccountInvoice, self).write(values)
+        if result:
+            self.recalculate_tax_lines()
+        return result
+
+    def recalculate_tax_lines(self):
+        """ Method to recalculate tax lines in purchase invoices. """
+        for tax_line_id in self.tax_line_ids:
+            invoice_line_ids = self.invoice_line_ids.filtered(
+                lambda x: x.invoice_line_tax_ids.ids == tax_line_id.tax_id.ids)
+            if invoice_line_ids:
+                tax_line_id.write({
+                    "amount": sum(invoice_line_ids.mapped(
+                        "price_subtotal")) * (tax_line_id.tax_id.amount / 100)})
