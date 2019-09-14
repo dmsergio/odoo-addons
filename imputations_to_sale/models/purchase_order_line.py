@@ -9,6 +9,11 @@ class PurchaseOrderLine(models.Model):
 
     _inherit = 'purchase.order.line'
 
+    no_act = fields.Boolean(string="No act",
+                            help="No actualizar el precio de coste en la ficha"
+                                 " del producto."
+                            )
+
     stock_qty = fields.Float(
         string="Stock",
         help="Unidades reales en stock.",

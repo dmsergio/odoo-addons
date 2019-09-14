@@ -2,7 +2,7 @@
 # © 2019 Sergio Díaz (<sdimar@yahoo.com>).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models, api
+from odoo import models, api, fields
 
 
 class PurchaseOrder(models.Model):
@@ -73,3 +73,6 @@ class PurchaseOrder(models.Model):
                             lambda x: x.name.id == partner_id.id)
                     if supplierinfo:
                         supplierinfo.write({'price': line_id.price_unit})
+                        if not line_id.no_act:
+                            line_id.product_id.write(
+                                {"standard_price":   line_id.price_unit})

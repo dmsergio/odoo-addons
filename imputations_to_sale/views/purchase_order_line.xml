@@ -10,6 +10,9 @@
       <xpath expr='//field[@name="order_line"]/tree/field[@name="product_qty"]' position="before">
         <field name="stock_qty"/>
       </xpath>
+      <xpath expr='//field[@name="order_line"]/tree/field[@name="discount"]' position="before">
+        <field name="no_act"/>
+      </xpath>
       <xpath expr='//field[@name="order_line"]/form/sheet/group/group/label[@for="product_qty"]' position="before">
         <field name="stock_qty"/>
       </xpath>
@@ -19,6 +22,9 @@
       </xpath>
       <xpath expr='//field[@name="order_line"]/form/sheet/group/group/field[@name="price_unit"]' position="before">
         <field name="product_list_price_rel"/>
+      </xpath>
+      <xpath expr='//field[@name="order_line"]/form/sheet/group/group/field[@name="discount"]' position="before">
+        <field name="no_act" />
       </xpath>
       <!--delivery cost-->
       <xpath expr='//field[@name="order_line"]/tree/field[@name="taxes_id"]' position="before">
