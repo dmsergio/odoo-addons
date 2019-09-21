@@ -7,13 +7,18 @@
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
-                <page name="sale_ids" string="Sale Orders">
+                <page name="sale_ids" string="Pedidos">
                     <field name="sale_ids">
                         <tree>
                             <field name="partner_id"/>
                             <field name="name"/>
                             <field name="confirmation_date"/>
                             <field name="state"/>
+                            <field name="s_title"/>
+                            <field name="s_main_qty"/>
+                            <field name="s_total"/>
+                            <field name="s_uom"/>
+                            <field name="s_type_pdf"/>
                         </tree>
                     </field>
                 </page>

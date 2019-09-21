@@ -7,13 +7,15 @@
     "website": "",
     "summary": "Impute employee costs to sale orders",
     "depends": [
+        "account",
         "product",
         "l10n_es",
         "sale",
         "sale_margin",
         "sales_team",
         "purchase",
-        "mejisa"
+        "mejisa",
+        "product_supplierinfo_discount"
     ],
     "data": [
         'security/ir.model.access.csv',
@@ -27,6 +29,7 @@
         'views/impute_material_to_sale.xml',
         'views/res_partner_view.xml',
         'views/mejisa_product_pricelist.xml',
+        'views/product_supplierinfo_view.xml',
     ],
     "active": False,
     "installable": True,
