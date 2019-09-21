@@ -76,7 +76,7 @@ class ResPartner(models.Model):
         account_obj = self.env['account.account']
         account_id = account_obj.search([('code','=',code)])
         if account_id:
-            raise UserError("Ya existe una cuenta bancaria con el código {0}.".format(code))
+            account_id = account_id[0]
         else:
             account_id = account_obj.create({
                 'name': partner_id.name,
