@@ -14,6 +14,7 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, values):
         sale_id = super(SaleOrder, self).create(values)
+        self.explode_bom()
         sale_id.order_line.recalculate_subtotal()
         self._prepare_compensator_order_line(sale_id)
         return sale_id
@@ -21,6 +22,7 @@ class SaleOrder(models.Model):
     @api.one
     def write(self, values):
         res = super(SaleOrder, self).write(values)
+        self.explode_bom()
         if not self.state == "done":
             sale_id = self
             self.order_line.recalculate_subtotal()
@@ -67,3 +69,23 @@ class SaleOrder(models.Model):
             order_id = lines.filtered(lambda x: x.order_id)
             order_id = self.search([('id', '=', order_id.order_id.id)], limit=1)
             return order_id
+
+    def explode_bom(self):
+        sale_line_obj = self.env["sale.order.line"]
+        for line in self.order_line:
+            boms = line.product_id.bom_ids.filtered(
+                    lambda x: x.type == 'normal')
+            if not boms:
+                continue
+            bom = max(boms, key=lambda x: x['id'])
+            for bom_line in bom.bom_line_ids:
+                sale_line_obj.create({
+                    'product_id': bom_line.product_id.id,
+                    'product_uom_qty': bom_line.product_qty *
+                                       line.product_uom_qty,
+                    'price_unit': bom_line.product_id.lst_price,
+                    'purchase_price': bom_line.product_id.standard_price,
+                    'name': '[%s] %s' % (bom_line.product_id.default_code or "",
+                                         bom_line.product_id.name),
+                    'order_id': line.order_id.id})
+            line.unlink()
