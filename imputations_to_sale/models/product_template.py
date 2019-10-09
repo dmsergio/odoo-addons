@@ -130,16 +130,6 @@ class ProductTemplate(models.Model):
             self.recalculate_price_list(self)
         return res
 
-    @api.multi
-    def name_get(self):
-        res = []
-        for product in self:
-            name = "[%s] %s [stock: %s]" % \
-                   (product.default_code or "",
-                    product.name, product.qty_available)
-            res.append((product.id, name))
-        return res
-
 
 class ProductProduct(models.Model):
 

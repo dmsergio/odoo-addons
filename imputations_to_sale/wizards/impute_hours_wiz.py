@@ -19,20 +19,23 @@ class ImputeHoursWiz(models.TransientModel):
     partner_id = fields.Many2one(
         comodel_name="res.partner",
         string="Cliente",
-        readonly=True)
+        readonly=True,
+        ondelete="cascade")
 
     sale_id = fields.Many2one(
         comodel_name="sale.order",
         string="Pedido de venta",
         domain="[('state', '!=', 'cancel'),"
-               "('invoice_status', '!=', 'invoiced')]")
+               "('invoice_status', '!=', 'invoiced')]",
+        ondelete="cascade")
 
     product_id = fields.Many2one(
         comodel_name="product.template",
         string="Operario",
         help="Producto operario sobre el que se realizará el registro de "
              "tiempos, teniendo en cuenta cada uno de los registros en los "
-             "puestos de trabajo indicados.")
+             "puestos de trabajo indicados.",
+        ondelete="cascade")
 
     type_working_day = fields.Selection(
         [("regular", "Normal"),
@@ -76,14 +79,16 @@ class ImputeHoursWiz(models.TransientModel):
         inverse_name="impute_hours_id",
         string="Tiempos en Puesto de Trabajo",
         help="Indica la cantidad de horas a registrar del operario en los "
-             "correspondientes puestos de trabajo.")
+             "correspondientes puestos de trabajo.",
+        ondelete="cascade")
 
     sale_order_line_ids = fields.Many2many(
         comodel_name="sale.order.line",
         string="Tiempos del operario",
         help="Líneas del pedido de venta seleccionado con el registro de "
              "tiempos.",
-        readonly=True)
+        readonly=True,
+        ondelete="cascade")
 
     has_work_order_quantity_ids = fields.Boolean()
 
@@ -287,12 +292,14 @@ class WorkOrderQuantityWiz(models.TransientModel):
     _name = 'work_order.quantity.wiz'
 
     impute_hours_id = fields.Many2one(
-        comodel_name="impute.hours.wiz")
+        comodel_name="impute.hours.wiz",
+        ondelete="cascade")
 
     product_id = fields.Many2one(
         comodel_name="product.template",
         string="Puesto de trabajo",
-        required=True)
+        required=True,
+        ondelete="cascade")
 
     product_qty = fields.Float(
         string="Horas",
@@ -301,7 +308,8 @@ class WorkOrderQuantityWiz(models.TransientModel):
     product_uom_id = fields.Many2one(
         comodel_name="product.uom",
         string="Unidad de medida",
-        readonly=True)
+        readonly=True,
+        ondelete="cascade")
 
     @api.onchange("product_id")
     def onchange_product_id(self):

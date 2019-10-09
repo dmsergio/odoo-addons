@@ -16,18 +16,21 @@ class ImputeHoursWiz(models.TransientModel):
         string="Pedido de venta",
         domain="[('state', '!=', 'cancel'),"
                "('invoice_status', '!=', 'invoiced')]",
-        required=True)
+        required=True,
+        ondelete="cascade")
 
     sale_order_line_ids = fields.Many2many(
         comodel_name="sale.order.line",
-        string="Líneas del pedido")
+        string="Líneas del pedido",
+        ondelete="cascade")
 
     product_id = fields.Many2one(
         comodel_name="product.template",
         string="Producto",
         help="Especifique el producto, ya sea de OPERARIOS o de LABORES, al "
              "que se utilizará para realizar la imputación del precio.",
-        required=True)
+        required=True,
+        ondelete="cascade")
 
     quantity = fields.Float(
         string="Cantidad")
@@ -35,7 +38,8 @@ class ImputeHoursWiz(models.TransientModel):
     partner_id = fields.Many2one(
         comodel_name="res.partner",
         string="Cliente",
-        readonly=True)
+        readonly=True,
+        ondelete="cascade")
 
     s_title = fields.Char(string="Title", readonly=True)
 
