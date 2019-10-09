@@ -130,6 +130,14 @@ class ProductTemplate(models.Model):
             self.recalculate_price_list(self)
         return res
 
+    @api.onchange("default_code")
+    def onchange_default_code(self):
+        if self.default_code and len(self.default_code) >= 4:
+            category = self.env["product.category"].search([
+                ("name", "like", "%s%%" % self.default_code[0:4])], limit=1)
+            if category:
+                self.categ_id = category.id
+
 
 class ProductProduct(models.Model):
 
