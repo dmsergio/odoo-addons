@@ -38,11 +38,11 @@ class PurchaseOrderLine(models.Model):
     def _compute_amount(self):
         for line_id in self:
             price_unit = line_id.price_unit
-            product_qty = line_id.product_qty or 1
+            product_qty = line_id.product_qty
             discount = line_id.discount
             delivery_cost = line_id.delivery_cost
-            price_subtotal = price_unit * product_qty * (1 - discount / 100) + \
-                delivery_cost / product_qty
+            price_subtotal = \
+                price_unit * product_qty * (1 - discount / 100) + delivery_cost
             # Comprobamos el tipo de impuesto
             if line_id.taxes_id.amount_type == 'group':
                 taxes_amount = sum(
