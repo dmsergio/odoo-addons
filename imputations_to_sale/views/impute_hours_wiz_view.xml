@@ -25,6 +25,8 @@
               </group>
               <group>
                 <field name="vip_customer"/>
+                <field name="plant_hours"
+                       attrs="{'invisible': [('partner_id', '=', False)]}"/>
                 <field name="sale_hours"/>
                 <field name="subtotal" widget="monetary"/>
                 <field name="total_hours"/>
@@ -56,6 +58,7 @@
                   <field name="product_uom_qty"/>
                   <field name="product_uom"/>
                   <field name="order_date"/>
+                  <field name="sale_line_plant_hours"/>
                   <field name="type_working_day"/>
                   <field name="price_unit"/>
                   <field name="price_subtotal"/>

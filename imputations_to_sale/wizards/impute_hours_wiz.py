@@ -53,6 +53,9 @@ class ImputeHoursWiz(models.TransientModel):
         string="Cliente VIP?",
         readonly=True)
 
+    plant_hours = fields.Boolean(
+        string="Horas en planta")
+
     order_date = fields.Date(
         string="Fecha",
         required=True)
@@ -161,7 +164,9 @@ class ImputeHoursWiz(models.TransientModel):
             "type_working_day": self.type_working_day,
             "price_unit": price_unit,
             "purchase_price": cost_unit,
-            "order_date": self.order_date}
+            "order_date": self.order_date,
+            "sale_line_plant_hours": self.plant_hours
+        }
         self.env["sale.order.line"].create(line_values)
 
     def get_price(self, operator_product_id, product_id=False):
@@ -240,6 +245,7 @@ class ImputeHoursWiz(models.TransientModel):
         if self.sale_id:
             CurrentValues.sale_id = self.sale_id.id
             self.vip_customer = self.sale_id.partner_id.partner_vip
+            self.plant_hours = self.sale_id.partner_id.partner_plant_hours
             self.partner_id = self.sale_id.partner_id.id
             self.title = self.sale_id.s_title
             return
