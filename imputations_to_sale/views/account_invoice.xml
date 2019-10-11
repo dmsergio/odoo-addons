@@ -34,9 +34,6 @@
             <xpath expr="//field[@name='order_date']" position="after">
                 <field name="invoice_line_plant_hours"/>
             </xpath>
-<!--            <xpath expr="//page/field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="after">-->
-<!--                <field name="invoice_line_plant_hours" />-->
-<!--            </xpath>-->
         </field>
     </record>
 
