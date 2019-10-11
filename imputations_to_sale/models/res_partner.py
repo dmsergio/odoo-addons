@@ -11,6 +11,9 @@ class ResPartner(models.Model):
     partner_vip = fields.Boolean(
         string="Cliente VIP?")
 
+    partner_plant_hours = fields.Boolean(
+        string="Horas en planta")
+
     reduced_rate = fields.Boolean(
         string="Tarifa reducida")
 

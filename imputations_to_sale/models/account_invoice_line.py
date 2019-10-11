@@ -10,14 +10,21 @@ class AccountInvoiceLine(models.Model):
     delivery_cost = fields.Float(
         string="Portes")
 
+    invoice_line_plant_hours = fields.Boolean(
+        string="Horas en planta",
+    compute='_compute_invoice_line_plant_hours')
+
     @api.model
     def create(self, values):
-        invoice_line_id = super(AccountInvoiceLine, self).create(values)
-        if invoice_line_id.purchase_line_id:
-            invoice_line_id.write({
+        invoice_line = super(AccountInvoiceLine, self).create(values)
+        if invoice_line.partner_id.partner_plant_hours:
+            invoice_line.invoice_line_plant_hours = \
+                invoice_line.partner_id.partner_plant_hours
+        if invoice_line.purchase_line_id:
+            invoice_line.write({
                 "delivery_cost":
-                    invoice_line_id.purchase_line_id.delivery_cost})
-        return invoice_line_id
+                    invoice_line.purchase_line_id.delivery_cost})
+        return invoice_line
 
     @api.one
     @api.depends(
@@ -44,3 +51,8 @@ class AccountInvoiceLine(models.Model):
                 price_subtotal_signed, self.invoice_id.company_id.currency_id)
         sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
         self.price_subtotal_signed = price_subtotal_signed * sign
+
+    @api.one
+    def _compute_invoice_line_plant_hours(self):
+        self.invoice_line_plant_hours = \
+            self.sale_line_ids.sale_line_plant_hours

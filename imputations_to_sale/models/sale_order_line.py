@@ -2,11 +2,11 @@
 # © 2019 Sergio Díaz (<sdimar@yahoo.com>).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models, fields
+from odoo import models, fields, api
 import datetime
 
 
-class SaleOrder(models.Model):
+class SaleOrderLine(models.Model):
 
     _inherit = 'sale.order.line'
 
@@ -25,6 +25,10 @@ class SaleOrder(models.Model):
          ("night_holiday", "Nocturna/Festiva")],
         string="Tipo de jornada",
         default="regular")
+
+    sale_line_plant_hours = fields.Boolean(
+        string="Horas en planta")
+
 
     def recalculate_subtotal(self):
         # OPERARIOS
@@ -71,3 +75,12 @@ class SaleOrder(models.Model):
 
     def get_machine_category(self):
         return self.env["product.category"].browse(770).ids
+
+    @api.multi
+    @api.onchange('product_id')
+    def product_id_change(self):
+        res = super(SaleOrderLine, self).product_id_change()
+        if self.product_id:
+            self.sale_line_plant_hours = \
+                self.order_id.partner_id.partner_plant_hours
+        return res
