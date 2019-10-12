@@ -125,7 +125,8 @@ class ImputeHoursWiz(models.TransientModel):
                     CurrentValues.product_id)
                 product_qty = work_order_quantity_id.product_qty
                 price_unit, cost_unit = self.get_price(operator_product_id)
-                name = operator_product_id.name
+                name = "[%s] %s" % (operator_product_id.default_code or "",
+                                    operator_product_id.name)
                 self.create_sale_order_line(
                     operator_product_id, product_qty, price_unit, cost_unit,
                     name)
