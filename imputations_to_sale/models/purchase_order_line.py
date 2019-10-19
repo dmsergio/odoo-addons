@@ -42,7 +42,8 @@ class PurchaseOrderLine(models.Model):
             discount = line_id.discount
             delivery_cost = line_id.delivery_cost
             price_subtotal = \
-                price_unit * product_qty * (1 - discount / 100) + delivery_cost
+                (price_unit * product_qty * (1 - discount / 100)) + (
+                        delivery_cost * product_qty)
             # Comprobamos el tipo de impuesto
             if line_id.taxes_id.amount_type == 'group':
                 taxes_amount = sum(
