@@ -155,3 +155,11 @@ class ProductProduct(models.Model):
         if res and not values.get("list_price", False):
             self.env["product.template"].recalculate_price_list(self)
         return res
+
+    @api.onchange("default_code")
+    def onchange_default_code(self):
+        if self.default_code and len(self.default_code) >= 4:
+            category = self.env["product.category"].search([
+                ("name", "like", "%s%%" % self.default_code[0:4])], limit=1)
+            if category:
+                self.categ_id = category.id
