@@ -34,16 +34,13 @@ class PurchaseOrderLine(models.Model):
             ("product_id", "=", self.product_id.id),
             ("location_id", "=", location_id.id)]).mapped("qty"))
 
-    @api.depends('product_qty', 'price_unit', 'taxes_id', 'delivery_cost')
+    @api.depends('product_qty', 'price_unit', 'taxes_id')
     def _compute_amount(self):
         for line_id in self:
             price_unit = line_id.price_unit
             product_qty = line_id.product_qty
             discount = line_id.discount
-            delivery_cost = line_id.delivery_cost
-            price_subtotal = \
-                (price_unit * product_qty * (1 - discount / 100)) + (
-                        delivery_cost * product_qty)
+            price_subtotal = (price_unit * product_qty * (1 - discount / 100))
             # Comprobamos el tipo de impuesto
             if line_id.taxes_id.amount_type == 'group':
                 taxes_amount = sum(
