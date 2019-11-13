@@ -10,6 +10,11 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     global_price = fields.Float(string="Precio Global")
+    picking_pending = fields.Boolean(string="Pedidos pendientes",
+                                     states={'done': [('readonly', True)],
+                                             'sale': [('readonly', True)],
+                                             'sent': [('readonly', True)]
+                                             })
 
     @api.model
     def create(self, values):
