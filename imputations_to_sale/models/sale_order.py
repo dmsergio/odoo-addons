@@ -10,6 +10,12 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     global_price = fields.Float(string="Precio Global")
+    picking_pending = fields.Boolean(
+        string="Pedidos pendientes",
+        states={
+            'draft': [('readonly', True)],
+            'done': [('readonly', True)],
+            'cancel': [('readonly', True)]})
 
     @api.model
     def create(self, values):
@@ -89,3 +95,9 @@ class SaleOrder(models.Model):
                                          bom_line.product_id.name),
                     'order_id': line.order_id.id})
             line.unlink()
+
+    @api.multi
+    def action_cancel(self):
+        for record in self:
+            if super(SaleOrder, record).action_cancel():
+                record.write({'picking_pending': False})
