@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_value_tree_view" model="ir.ui.view">
+        <field name="name">stock.value.tree.view</field>
+        <field name="model">stock.value</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Value Entries" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="stock_value"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_value_action" model="ir.actions.act_window">
+        <field name="name">Inventory Value</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.value</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="stock_value_menu"
+              name="Inventory Value"
+              parent="stock.menu_stock_inventory_control"
+              action="stock_value_action"
+              sequence="50"/>
+
+</odoo>
