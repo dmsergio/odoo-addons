@@ -9,8 +9,9 @@
             <field eval="False" name="doall"/>
             <field name="model">stock.value</field>
             <field name="function">_stock_value_process</field>
+            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="args">()</field>
-            <field name="active" eval="False"/>
+            <field name="active" eval="True"/>
         </record>
     </data>
 </odoo>
