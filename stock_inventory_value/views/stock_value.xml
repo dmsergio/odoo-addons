@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Stock Value Entries" create="false" edit="false" delete="false">
                 <field name="date"/>
-                <field name="stock_value"/>
+                <field name="stock_value" widget="monetary"/>
             </tree>
         </field>
     </record>
@@ -21,10 +21,7 @@
         <field name="target">current</field>
     </record>
 
-    <menuitem id="stock_value_menu"
-              name="Inventory Value"
-              parent="stock.menu_stock_inventory_control"
-              action="stock_value_action"
-              sequence="50"/>
+    <menuitem id="stock_value_menu" name="Inventory Value" parent="stock.menu_stock_inventory_control"
+              action="stock_value_action" sequence="50"/>
 
 </odoo>
