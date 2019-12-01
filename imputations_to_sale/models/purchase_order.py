@@ -18,8 +18,8 @@ class PurchaseOrder(models.Model):
     @api.model
     def create(self, values):
         sale_id = super(PurchaseOrder, self).create(values)
-        self.add_partner_in_product_supplierinfo(sale_id.partner_id,
-                                                 sale_id.order_line)
+        self.add_partner_in_product_supplierinfo(
+            sale_id.partner_id, sale_id.order_line)
         return sale_id
 
     @api.one

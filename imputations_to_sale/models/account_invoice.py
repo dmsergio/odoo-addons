@@ -89,6 +89,7 @@ class AccountInvoice(models.Model):
 
     def recalculate_tax_lines(self):
         """ Method to recalculate tax lines in purchase invoices. """
+        self.ensure_one()
         for tax_line_id in self.tax_line_ids:
             invoice_line_ids = self.invoice_line_ids.filtered(
                 lambda x: x.invoice_line_tax_ids.ids == tax_line_id.tax_id.ids)

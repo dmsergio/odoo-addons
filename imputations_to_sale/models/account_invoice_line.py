@@ -34,7 +34,8 @@ class AccountInvoiceLine(models.Model):
         'delivery_cost')
     def _compute_price(self):
         currency = self.invoice_id and self.invoice_id.currency_id or None
-        price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
+        price = self.price_unit * (1 - (self.discount or 0.0) / 100.0) + \
+                self.delivery_cost
         taxes = False
         if self.invoice_line_tax_ids:
             taxes = self.invoice_line_tax_ids.compute_all(
