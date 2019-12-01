@@ -76,22 +76,24 @@ class AccountInvoice(models.Model):
     @api.model
     def create(self, values):
         invoice_id = super(AccountInvoice, self).create(values)
-        invoice_id.recalculate_tax_lines()
+        if invoice_id.type == 'in_invoice':
+            invoice_id.recalculate_tax_lines()
         return invoice_id
     
     @api.one
     def write(self, values):
         result = super(AccountInvoice, self).write(values)
-        if result:
+        if result and self.type == 'in_invoice':
             self.recalculate_tax_lines()
         return result
 
     def recalculate_tax_lines(self):
         """ Method to recalculate tax lines in purchase invoices. """
+        self.ensure_one()
         for tax_line_id in self.tax_line_ids:
             invoice_line_ids = self.invoice_line_ids.filtered(
                 lambda x: x.invoice_line_tax_ids.ids == tax_line_id.tax_id.ids)
             if invoice_line_ids:
                 tax_line_id.write({
-                    "amount": sum(invoice_line_ids.mapped(
-                        "price_subtotal")) * (tax_line_id.tax_id.amount / 100)})
+                    'amount': sum(invoice_line_ids.mapped('purchase_line_id').
+                                  mapped('price_tax'))})
