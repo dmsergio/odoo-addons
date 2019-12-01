@@ -12,7 +12,7 @@ class AccountInvoiceLine(models.Model):
 
     invoice_line_plant_hours = fields.Boolean(
         string="Horas en planta",
-    compute='_compute_invoice_line_plant_hours')
+        compute='_compute_invoice_line_plant_hours')
 
     @api.model
     def create(self, values):
@@ -41,8 +41,8 @@ class AccountInvoiceLine(models.Model):
                 price, currency, self.quantity, product=self.product_id,
                 partner=self.invoice_id.partner_id)
         self.price_subtotal = price_subtotal_signed = taxes[
-            'total_excluded'] + self.delivery_cost if taxes else \
-            self.quantity * price + self.delivery_cost
+            'total_excluded'] if taxes else \
+            self.quantity * price
         if self.invoice_id.currency_id and self.invoice_id.company_id and \
                 self.invoice_id.currency_id != \
                 self.invoice_id.company_id.currency_id:
