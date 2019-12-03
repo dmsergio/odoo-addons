@@ -17,68 +17,59 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def create(self, values):
-        sale_id = super(PurchaseOrder, self).create(values)
-        self.add_partner_in_product_supplierinfo(
-            sale_id.partner_id, sale_id.order_line)
-        return sale_id
+        sale = super(PurchaseOrder, self).create(values)
+        sale.add_partner_in_product_supplierinfo()
+        return sale
 
-    @api.one
+    @api.multi
     def write(self, values):
         res = super(PurchaseOrder, self).write(values)
-        self.add_partner_in_product_supplierinfo(self.partner_id, self.order_line)
+        if res:
+            for sale in self:
+                sale.add_partner_in_product_supplierinfo()
         return res
 
 
-    def add_partner_in_product_supplierinfo(self, partner_id, order_line):
-        ''' This function add a new supplier in the product file every time a
-            purchase is made with a different supplier
-        :param partner_id:
-        :param order_line:
-        :return:
-        '''
-        obj_prodsupplierinfo = self.env['product.supplierinfo']
-        if partner_id and order_line:
-            for line in order_line:
-                seller_ids = line.product_id.seller_ids
-                supplierinfo = \
-                    seller_ids.filtered(lambda x: x.name.id == partner_id.id)
-                if not supplierinfo:
-                    supplierinfo_vals = {
-                        'name': partner_id.id
-                    }
-                    supplierinfo_id = \
-                        obj_prodsupplierinfo.create(supplierinfo_vals)
-                    line.product_id.seller_ids = [(4, supplierinfo_id.id)]
-            return True
+    def add_partner_in_product_supplierinfo(self):
+        """
+        This method add a new supplier in the product file every time a purchase
+        is made with a different supplier.
+        """
+        self.ensure_one()
+        product_supplier_info_obj = self.env['product.supplierinfo']
+        for line in self.order_line:
+            sellers = line.product_id.seller_ids
+            supplier = \
+                sellers.filtered(lambda x: x.name.id == self.partner_id.id)
+            if not supplier:
+                new_supplier = product_supplier_info_obj.create({
+                    'name': self.partner_id.id})
+                line.product_id.seller_ids = [(4, new_supplier.id)]
+        return
 
     @api.multi
     def button_confirm(self):
-        super(PurchaseOrder, self).button_confirm()
-        self.update_product_supplier_cost(self.partner_id, self.order_line)
-        return True
+        res = super(PurchaseOrder, self).button_confirm()
+        if res:
+            self.update_product_supplier_cost()
+        return res
 
 
-    def update_product_supplier_cost(self, partner_id, order_line):
-        ''' Update product supplier cost
-        :param partner_id:
-        :param order_line:
-        :return:
-        '''
-        if partner_id and order_line:
-            for line_id in order_line:
-                seller_ids = line_id.product_id.seller_ids
-                if seller_ids:
-                    supplierinfo = \
-                        seller_ids.filtered(
-                            lambda x: x.name.id == partner_id.id)
-                    if supplierinfo:
-                        supplierinfo.write({
-                            'price': line_id.price_unit,
-                            'discount': line_id.discount,
-                            'delivery_cost': line_id.delivery_cost})
-                        if not line_id.no_act:
-                            line_id.product_id.write(
-                                {"standard_price": line_id.price_unit -
-                                                   (line_id.price_unit *
-                                                    (line_id.discount / 100)) +
-                                                   line_id.delivery_cost})
+    def update_product_supplier_cost(self):
+        """
+        Method to update costs on supplier of products of each purchase order
+        line.
+        """
+        for line in self.order_line:
+            supplier = line.product_id.seller_ids.filtered(
+                lambda x: x.name.id == self.partner_id.id)
+            if supplier:
+                supplier.write({
+                    'price': line.price_unit,
+                    'discount': line.discount,
+                    'delivery_cost': line.delivery_cost})
+                if not line.no_act:
+                    price = line.price_unit * (
+                            1 - line.discount) + line.delivery_cost
+                    line.product_id.write({'standard_price': price})
+        return
