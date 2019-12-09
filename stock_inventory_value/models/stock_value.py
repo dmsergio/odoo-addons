@@ -23,7 +23,8 @@ class StockValue(models.Model):
     def _stock_value_process(self):
         _logger.info("@Stock value cron: Start process")
         quant_obj = self.env['stock.quant']
-        product_domain = [('type', '=', 'product')]
+        product_domain = [('type', '=', 'product'),
+                          ('excluded_product', '!=', True)]
         products = self.env['product.product'].search(product_domain)
         cont = 0
         stock_value = 0

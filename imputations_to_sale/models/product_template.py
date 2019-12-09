@@ -40,6 +40,8 @@ class ProductTemplate(models.Model):
 
     fixed_price = fields.Boolean(string="Precio fijo")
 
+    excluded_product = fields.Boolean(string="Productos Excluido")
+
 
     @api.one
     @api.depends('categ_id')
@@ -142,6 +144,8 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
 
     _inherit = 'product.product'
+
+    excluded_product = fields.Boolean(string="Productos Excluido")
 
     @api.model
     def create(self, values):
