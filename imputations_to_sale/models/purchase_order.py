@@ -70,6 +70,6 @@ class PurchaseOrder(models.Model):
                     'delivery_cost': line.delivery_cost})
                 if not line.no_act:
                     price = line.price_unit * (
-                            1 - line.discount) + line.delivery_cost
+                            1 - (line.discount / 100)) + line.delivery_cost
                     line.product_id.write({'standard_price': price})
         return
