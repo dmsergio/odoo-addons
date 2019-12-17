@@ -5,7 +5,7 @@
         <field name="name">stock.value.tree.view</field>
         <field name="model">stock.value</field>
         <field name="arch" type="xml">
-            <tree string="Stock Value Entries" create="false" edit="false" delete="false">
+            <tree string="Stock Value Entries" create="false" edit="false" delete="true" default_order="date desc">
                 <field name="date"/>
                 <field name="stock_value" widget="monetary"/>
             </tree>
