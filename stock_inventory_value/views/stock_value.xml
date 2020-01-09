@@ -6,9 +6,27 @@
         <field name="model">stock.value</field>
         <field name="arch" type="xml">
             <tree string="Stock Value Entries" create="false" edit="false" delete="true" default_order="date desc">
+                <field name="id"/>
                 <field name="date"/>
                 <field name="stock_value" widget="monetary"/>
             </tree>
+        </field>
+    </record>
+
+    <record id="stock_value_form_view" model="ir.ui.view">
+        <field name="name">stock.value.form.view</field>
+        <field name="model">stock.value</field>
+        <field name="arch" type="xml">
+            <form string="Valor del stock">
+                <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="stock_value"/>
+                        <field name="currency_id"/>
+                        <field name="stock_value_line_ids"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -17,7 +35,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">stock.value</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,form</field>
         <field name="target">current</field>
     </record>
 
