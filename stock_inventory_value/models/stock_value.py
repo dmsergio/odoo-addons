@@ -2,9 +2,8 @@
 # Copyright 2019 Sergio Díaz  <sdimar@yahoo.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from odoo import api, models, fields, _
 import logging
-
-from odoo import api, models, fields
 
 _logger = logging.getLogger(__name__)
 
@@ -16,6 +15,18 @@ class StockValue(models.Model):
     stock_value = fields.Monetary(string="Stock value", required=True, readonly=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id.id)
     stock_value_line_ids = fields.One2many(comodel_name="stock.value.line", inverse_name="stock_value_id", string="Líneas", required=False, )
+
+    @api.multi
+    def action_view_stock_value_line(self):
+        stock_value_line_ids = self.id
+        return {'name': 'Stock Value Lines',
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'tree,form',
+                'target': 'current',
+                'res_model': 'stock.value.line',
+                'domain': [('stock_value_id', 'in', [stock_value_line_ids])]
+                }
 
 
 class StockValueLine(models.Model):
@@ -31,7 +42,7 @@ class StockValueLine(models.Model):
     def _stock_value_line_process(self):
         _logger.info("@Stock value cron: Start process")
 
-        # Se crea primero la cabecera del stock value
+        # Crear primero la cabecera del stock value
         stock_value_obj = self.env['stock.value']
         stock_value_id = stock_value_obj.create({'date': fields.Datetime.now(), 'stock_value': 0.0, })
         print(stock_value_id)
@@ -54,4 +65,6 @@ class StockValueLine(models.Model):
                          'stock_value_id': stock_value_id.id,
                          })
             # _logger.info("@Stock value cron: End process.")
+
+        # Actualizar cabecera stock value
         return
