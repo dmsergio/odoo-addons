@@ -52,6 +52,7 @@ class StockValueLine(models.Model):
         product_domain = [('type', '=', 'product'), ('excluded_product', '!=', True), ('qty_available', '>', 0.0), ('active', '=', True)]
         products = self.env['product.template'].search(product_domain)
         cont = 0
+        stock_value_sum = 0.0
         for product in products:
             cont += 1
             _logger.info("@Stock value cron: Computing total value for the "
@@ -59,6 +60,7 @@ class StockValueLine(models.Model):
             # quant_domain = [('product_id', '=', product.id), ('location_id.usage', '=', 'internal')]
             # quants = quant_obj.search(quant_domain)
             stock_value = round(product.qty_available * product.standard_price, 2)
+            stock_value_sum = stock_value_sum + stock_value
             # _logger.info("@Stock value cron: Creating stock.value entry...")
             self.create({'date': fields.Date.today(),
                          'stock_value': stock_value,
@@ -68,4 +70,5 @@ class StockValueLine(models.Model):
                          'stock_value_id': stock_value_id.id,
                          })
             # _logger.info("@Stock value cron: End process.")
+        stock_value_id.update({'date': fields.Datetime.now(), 'stock_value': stock_value_sum, })
         return
