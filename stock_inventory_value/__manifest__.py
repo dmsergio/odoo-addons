@@ -12,7 +12,7 @@
     'website': '',
     'category': 'Stock',
     'description': '''
-    Addon that allow save a history of inventory value daily.
+    Addon that allow save a history of inventory value daily or when user decide.
     ''',
     'data': [
         'data/cron.xml',

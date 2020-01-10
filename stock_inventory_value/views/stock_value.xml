@@ -6,11 +6,10 @@
         <field name="model">stock.value</field>
         <field name="arch" type="xml">
             <tree string="Stock Value Entries" create="false" edit="false" delete="true" default_order="date desc">
-                <field name="id"/>
                 <field name="date"/>
                 <field name="stock_value" widget="monetary"/>
                 <button class="oe_stat_button" name="action_view_stock_value_line"
-                        string="Stock Value Lines" type="object" icon="fa-bars"/>
+                        string="Valor líneas de stock" type="object"/>
             </tree>
         </field>
     </record>
@@ -38,6 +37,8 @@
         <field name="arch" type="xml">
             <tree string="Líneas stock" create="false" edit="false" delete="false" default_order="product_id asc">
                 <field name="product_id"/>
+                <field name="stock_qty"/>
+                <field name="cost_price"/>
                 <field name="stock_value" sum="Stock value"/>
             </tree>
         </field>
