@@ -1,92 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
+    <data>
 
-    <record id="impute_hours_wiz_form_view" model="ir.ui.view">
-      <field name="name">impute_hours_wiz_form_view</field>
-      <field name="model">impute.hours.wiz</field>
-      <field name="arch" type="xml">
-        <form string="Registro de Tiempos">
-          <sheet>
-            <group>
-              <group>
-                <field name="has_work_order_quantity_ids" invisible="1"/>
-                <field name="product_id"
-                       attrs="{
+        <record id="impute_hours_wiz_form_view" model="ir.ui.view">
+            <field name="name">impute_hours_wiz_form_view</field>
+            <field name="model">impute.hours.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Registro de Tiempos">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="has_work_order_quantity_ids" invisible="1"/>
+                                <field name="product_dummy_id" invisible="1"/>
+                                <field name="product_id" force_save="1"
+                                       attrs="{
                         'readonly': [('has_work_order_quantity_ids', '=', True)],
                         'required': [('has_work_order_quantity_ids', '=', False)]}"
-                       options="{'no_create': True}"/>
-                <field name="order_date"/>
-                <field name="type_working_day"/>
-                <field name="title" attrs="{'invisible': [('sale_id', '=', False)]}"/>
-                <field name="partner_id" attrs="{'invisible': [('sale_id', '=', False)]}"/>
-                <field name="sale_id"
-                       options="{'no_create': True}"/>
-              </group>
-              <group>
-                <field name="vip_customer"/>
-                <field name="plant_hours"
-                       attrs="{'invisible': [('partner_id', '=', False)]}"/>
-                <field name="sale_hours"/>
-                <field name="subtotal" widget="monetary"/>
-                <field name="total_hours"/>
-              </group>
-            </group>
-            <group attrs="{'invisible': [('sale_id', '=', False)]}">
-              <group string="Tiempos en Puesto de Trabajo">
-                <field name="work_order_quantity_ids" nolabel="1">
-                  <tree editable="top">
-                    <field name="product_id"/>
-                    <field name="product_qty"/>
-                    <field name="product_uom_id"/>
-                  </tree>
-                </field>
-              </group>
-              <group>
-                <button name="create_impute_to_sale" string="Aplicar" type="object"/>
-              </group>
-              <group/>
-            </group>
-            <group string="Líneas del operario" attrs="{'invisible': [('product_id', '=', False)]}">
-              <field name="sale_order_line_ids"
-                     readonly="1"
-                     nolabel="1">
-                <tree>
-                  <field name="order_id"/>
-                  <field name="product_id"/>
-                  <field name="name"/>
-                  <field name="product_uom_qty"/>
-                  <field name="product_uom"/>
-                  <field name="order_date"/>
-                  <field name="sale_line_plant_hours"/>
-                  <field name="type_working_day"/>
-                  <field name="price_unit"/>
-                  <field name="price_subtotal"/>
-                </tree>
-              </field>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
+                                       options="{'no_create': True}"/>
+                                <field name="order_date"/>
+                                <field name="type_working_day"/>
+                                <field name="title" attrs="{'invisible': [('sale_id', '=', False)]}"/>
+                                <field name="partner_id" attrs="{'invisible': [('sale_id', '=', False)]}"/>
+                                <field name="sale_id" options="{'no_create': True}" force_save="1"/>
+                            </group>
+                            <group>
+                                <field name="vip_customer"/>
+                                <field name="plant_hours" attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                                <field name="sale_hours"/>
+                                <field name="subtotal" widget="monetary"/>
+                                <field name="total_hours"/>
+                            </group>
+                        </group>
+                        <group attrs="{'invisible': [('sale_id', '=', False)]}">
+                            <group string="Tiempos en Puesto de Trabajo">
+                                <field name="work_order_quantity_ids" nolabel="1">
+                                    <tree editable="top">
+                                        <field name="product_id"/>
+                                        <field name="product_qty"/>
+                                        <field name="product_uom_id"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group>
+                                <button name="create_impute_to_sale" string="Aplicar" type="object"/>
+                            </group>
+                            <group/>
+                        </group>
+                        <group string="Líneas del operario" attrs="{'invisible': [('product_id', '=', False)]}">
+                            <field name="sale_order_line_ids"
+                                   readonly="1"
+                                   nolabel="1">
+                                <tree>
+                                    <field name="order_id"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom"/>
+                                    <field name="order_date"/>
+                                    <field name="sale_line_plant_hours"/>
+                                    <field name="type_working_day"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-    <record id="impute_hours_wiz_action" model="ir.actions.act_window">
-			<field name="name">Registro de tiempos</field>
-			<field name="res_model">impute.hours.wiz</field>
-			<field name="view_mode">form</field>
-			<field name="target">inline</field>
-		</record>
+        <record id="impute_hours_wiz_action" model="ir.actions.act_window">
+            <field name="name">Registro de tiempos</field>
+            <field name="res_model">impute.hours.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
 
-    <menuitem id="impute_to_sale_menu"
-							parent="sales_team.menu_base_partner"
-              name="Registros"
-							sequence="6"/>
+        <menuitem id="impute_to_sale_menu" parent="sales_team.menu_base_partner"
+                  name="Registros" sequence="6"/>
 
-    <menuitem id="impute_hours_wiz_menu"
-							name="Registro de tiempos"
-							parent="impute_to_sale_menu"
-							action="impute_hours_wiz_action"
-							sequence="10"/>
+        <menuitem id="impute_hours_wiz_menu" name="Registro de tiempos" parent="impute_to_sale_menu"
+                  action="impute_hours_wiz_action" sequence="10"/>
 
-  </data>
+    </data>
 </odoo>
