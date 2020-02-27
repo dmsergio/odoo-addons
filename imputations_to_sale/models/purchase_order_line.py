@@ -42,12 +42,22 @@ class PurchaseOrderLine(models.Model):
             discount = line_id.discount
             price_subtotal = (
                     price_unit * product_qty * (1 - discount / 100))
-            # Comprobamos el tipo de impuesto
-            if line_id.taxes_id.amount_type == 'group':
-                taxes_amount = sum(
-                    line_id.taxes_id.children_tax_ids.mapped("amount")) / 100
-            else:
-                taxes_amount = sum(line_id.taxes_id.mapped("amount")) / 100
+
+            # Comprobamos el tipo de impuesto y si hay uno o más
+            if len(line_id.taxes_id) <= 1:
+                if line_id.taxes_id.amount_type == 'group':
+                    taxes_amount = sum(
+                        line_id.taxes_id.children_tax_ids.mapped("amount")) / 100
+                else:
+                    taxes_amount = sum(line_id.taxes_id.mapped("amount")) / 100
+            elif len(line_id.taxes_id) > 1:
+                for rec in line_id.taxes_id:
+                    if rec.amount_type == 'group':
+                        taxes_amount = sum(
+                            rec.children_tax_ids.mapped("amount")) / 100
+                    else:
+                        taxes_amount = sum(rec.mapped("amount")) / 100
+
             price_total = price_subtotal + (price_subtotal * taxes_amount)
             line_id.update({
                 "price_subtotal": price_subtotal,
