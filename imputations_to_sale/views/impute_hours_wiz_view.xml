@@ -51,6 +51,8 @@
                                    readonly="1"
                                    nolabel="1">
                                 <tree>
+                                    <!-- Creo que habría que tener en cuenta el estado del pedido -->
+                                    <field name="id"/>
                                     <field name="order_id"/>
                                     <field name="product_id"/>
                                     <field name="name"/>
@@ -61,6 +63,7 @@
                                     <field name="type_working_day"/>
                                     <field name="price_unit"/>
                                     <field name="price_subtotal"/>
+                                    <button name="mejisa_unlink_line" type="object" icon="fa-trash"/>
                                 </tree>
                             </field>
                         </group>

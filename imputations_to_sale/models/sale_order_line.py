@@ -84,3 +84,11 @@ class SaleOrderLine(models.Model):
             self.sale_line_plant_hours = \
                 self.order_id.partner_id.partner_plant_hours
         return res
+
+    @api.multi
+    def mejisa_unlink_line(self):
+        #Habría que tener en cuenta el estado del pedido
+        for record in self:
+            print(record.id, "YEEEEEEEEEEE")
+            record.unlink()
+        return
