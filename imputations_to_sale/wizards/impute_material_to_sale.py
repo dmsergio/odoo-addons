@@ -14,7 +14,7 @@ class ImputeHoursWiz(models.TransientModel):
     sale_id = fields.Many2one(
         comodel_name="sale.order",
         string="Pedido de venta",
-        domain="[('state', '!=', 'cancel'),"
+        domain="[('state', 'in', ('draft', 'sent')),"
                "('invoice_status', '!=', 'invoiced')]",
         required=True,
         ondelete="cascade")
