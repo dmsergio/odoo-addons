@@ -120,6 +120,7 @@ class ImputeHoursWiz(models.TransientModel):
             'price_unit': price_unit,
             'purchase_price': cost_unit,
             'order_date': self.order_date,
+            'wiz_id': self.id,
             'sale_line_plant_hours': self.plant_hours}
         self.env['sale.order.line'].create(line_values)
 
@@ -172,7 +173,7 @@ class ImputeHoursWiz(models.TransientModel):
             ('parent_id', '=', parent_category_id)]).ids
 
     @api.onchange('product_id', 'order_date')
-    def onchange_and_date_product_id(self):
+    def onchange_date_and_product_id(self):
         self.product_dummy_id = self.product_id
         operator_category_ids = self.get_operator_category()
         products = self.env['product.template'].search([

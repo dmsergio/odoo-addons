@@ -28,6 +28,7 @@ class SaleOrderLine(models.Model):
 
     sale_line_plant_hours = fields.Boolean(
         string="Horas en planta")
+    wiz_id = fields.Integer()
 
 
     def recalculate_subtotal(self):
@@ -84,3 +85,20 @@ class SaleOrderLine(models.Model):
             self.sale_line_plant_hours = \
                 self.order_id.partner_id.partner_plant_hours
         return res
+
+    def unlink_line(self):
+        self.ensure_one()
+        HoursWiz = self.env['impute.hours.wiz']
+        wiz = HoursWiz.browse(self.wiz_id)
+        self.unlink()
+        context = self.env.context.copy()
+        context.update({
+            'default_product_id': wiz.product_dummy_id.id,
+            'default_order_date': wiz.order_date})
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'impute.hours.wiz',
+            'context': context,
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'inline'}
