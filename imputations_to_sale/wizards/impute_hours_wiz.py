@@ -120,7 +120,6 @@ class ImputeHoursWiz(models.TransientModel):
             'price_unit': price_unit,
             'purchase_price': cost_unit,
             'order_date': self.order_date,
-            'wiz_id': self.id,
             'sale_line_plant_hours': self.plant_hours}
         self.env['sale.order.line'].create(line_values)
 
