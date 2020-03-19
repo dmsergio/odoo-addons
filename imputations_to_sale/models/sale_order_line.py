@@ -90,12 +90,16 @@ class SaleOrderLine(models.Model):
         context = self.env.context.copy()
         context.update({
             'default_product_id': self.operator_product_id.id,
+            'default_sale_id': self.order_id.id,
             'default_order_date': self.order_date})
         self.unlink()
-        return {
+        vals = {
             'type': 'ir.actions.act_window',
-            'res_model': 'impute.hours.wiz',
+            'res_model': 'impute.hours.wiz'
+            if context.get('default_product_id') else 'impute.material.wiz',
             'context': context,
             'view_type': 'form',
             'view_mode': 'form',
-            'target': 'inline'}
+            'target': 'inline'
+        }
+        return vals
