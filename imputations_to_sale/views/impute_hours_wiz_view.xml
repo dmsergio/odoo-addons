@@ -61,6 +61,7 @@
                                     <field name="type_working_day"/>
                                     <field name="price_unit"/>
                                     <field name="price_subtotal"/>
+                                    <button name="unlink_line" type="object" icon="fa-trash"/>
                                 </tree>
                             </field>
                         </group>

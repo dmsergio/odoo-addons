@@ -84,3 +84,24 @@ class SaleOrderLine(models.Model):
             self.sale_line_plant_hours = \
                 self.order_id.partner_id.partner_plant_hours
         return res
+
+    def unlink_line(self):
+        self.ensure_one()
+        context = self.env.context.copy()
+        context.update({
+            'default_product_id': self.operator_product_id.id,
+            'default_order_date': self.order_date
+        })
+        if not context.get('default_product_id'):
+            context['default_sale_id'] = self.order_id.id
+        self.unlink()
+        vals = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'impute.hours.wiz'
+            if context.get('default_product_id') else 'impute.material.wiz',
+            'context': context,
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'inline'
+        }
+        return vals
