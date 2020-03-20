@@ -90,8 +90,10 @@ class SaleOrderLine(models.Model):
         context = self.env.context.copy()
         context.update({
             'default_product_id': self.operator_product_id.id,
-            'default_sale_id': self.order_id.id,
-            'default_order_date': self.order_date})
+            'default_order_date': self.order_date
+        })
+        if not context.get('default_product_id'):
+            context['default_sale_id'] = self.order_id.id
         self.unlink()
         vals = {
             'type': 'ir.actions.act_window',
