@@ -6,6 +6,14 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <button name="action_cancel" position="after">
+                <button name="action_unlink_product_line"
+                        states="sent" string="Eliminar líneas"
+                        class="btn-primary"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+            </button>
+
             <xpath expr='//field[@name="order_line"]//form/group/group/field[@name="tax_id"]' position="before">
                 <field name="order_date"/>
                 <field name="type_working_day" readonly="1"/>
@@ -18,6 +26,9 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="global_price"/>
+            </xpath>
+            <xpath expr="//field[@name='picking_policy']" position="after">
+                <field name="mrp_bom_ids" widget="many2one" />
             </xpath>
         </field>
     </record>

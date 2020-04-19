@@ -28,7 +28,10 @@ class SaleOrderLine(models.Model):
 
     sale_line_plant_hours = fields.Boolean(
         string="Horas en planta")
-
+    mrp_bom_id = fields.Many2one(
+        comodel_name='mrp.bom',
+        string='Lista de materiales',
+    )
 
     def recalculate_subtotal(self):
         # OPERARIOS
