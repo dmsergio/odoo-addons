@@ -23,6 +23,7 @@
         'data/mejisa_product_pricelist_data.xml',
         'views/account_invoice.xml',
         'views/product_view.xml',
+        'wizards/sale_order_remove_lines_views.xml',
         'views/sale_order_line.xml',
         'views/purchase_order_line.xml',
         'views/impute_hours_wiz_view.xml',
