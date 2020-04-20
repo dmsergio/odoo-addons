@@ -16,11 +16,14 @@ class SaleOrder(models.Model):
             'draft': [('readonly', True)],
             'done': [('readonly', True)],
             'cancel': [('readonly', True)]})
-    mrp_bom_ids = fields.Many2many(
-        comodel_name='mrp.bom',
-        string='Lista de materiales'
-        # compute='_compute_mrp_bom_lines'
-    )
+    has_bom = fields.Boolean(compute='_compute_has_bom')
+
+    @api.multi
+    @api.depends('order_line', 'order_line.mrp_bom_id')
+    def _compute_has_bom(self):
+        for sale in self:
+            if any(sale.order_line.filtered('mrp_bom_id')):
+                sale.has_bom = True
 
     @api.model
     def create(self, values):
@@ -95,7 +98,7 @@ class SaleOrder(models.Model):
                     'product_uom_qty': bom_line.product_qty *
                                        line.product_uom_qty,
                     'price_unit': bom_line.product_id.lst_price,
-                    'mrp_bom_id': bom_line.id,
+                    'mrp_bom_id': bom.id,
                     'purchase_price': bom_line.product_id.standard_price,
                     'name': '[%s] %s' % (bom_line.product_id.default_code or "",
                                          bom_line.product_id.name),
@@ -107,16 +110,3 @@ class SaleOrder(models.Model):
         for record in self:
             if super(SaleOrder, record).action_cancel():
                 record.write({'picking_pending': False})
-
-    @api.multi
-    def action_unlink_product_line(self):
-        self.ensure_one()
-        lines = self.order_line.filtered(
-            lambda l: l.mrp_bom_id.id in self.mrp_bom_ids.ids)
-        lines.unlink()
-
-    # @api.depends('order_line', 'order_line.product_id',
-    #              'order_line.mrp_bom_id')
-    # def _compute_mrp_bom_lines(self):
-    #     if self.order_line:
-    #         self.mrp_bom_ids = self.order_line.mapped('mrp_bom_id')

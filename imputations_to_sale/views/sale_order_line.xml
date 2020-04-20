@@ -7,11 +7,12 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <button name="action_cancel" position="after">
-                <button name="action_unlink_product_line"
+                <field name="has_bom" invisible="1"/>
+                <button name="%(imputations_to_sale.sale_order_remove_lines_action)d"
                         states="sent" string="Eliminar líneas"
                         class="btn-primary"
-                        type="object"
-                        attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        type="action"
+                        attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('has_bom', '=', False)]}"/>
             </button>
 
             <xpath expr='//field[@name="order_line"]//form/group/group/field[@name="tax_id"]' position="before">
@@ -26,9 +27,6 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="global_price"/>
-            </xpath>
-            <xpath expr="//field[@name='picking_policy']" position="after">
-                <field name="mrp_bom_ids" widget="many2one" />
             </xpath>
         </field>
     </record>
