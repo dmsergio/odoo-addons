@@ -17,6 +17,23 @@ class SaleOrder(models.Model):
             'done': [('readonly', True)],
             'cancel': [('readonly', True)]})
     has_bom = fields.Boolean(compute='_compute_has_bom')
+    pendent_to_invoice = fields.Float(
+        string='Pendent to invoice',
+        compute='_compute_pendent_to_invoice'
+    )
+
+    @api.multi
+    def _compute_pendent_to_invoice(self):
+        product_id = self.env['ir.values'].get_default(
+            'sale.config.settings', 'deposit_product_id_setting'
+        )
+        for sale in self:
+            lines = sale.order_line.filtered(
+                lambda sol: sol.product_id.id == product_id
+            )
+            deposit = sum(lines.mapped('price_unit'))
+            pendent_to_invoice = sale.amount_total - deposit
+            sale.pendent_to_invoice = pendent_to_invoice
 
     @api.multi
     @api.depends('order_line', 'order_line.mrp_bom_id')
