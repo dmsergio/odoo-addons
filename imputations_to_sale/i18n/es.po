@@ -1,0 +1,26 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* imputations_to_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-18 20:39+0000\n"
+"PO-Revision-Date: 2020-06-18 20:39+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: imputations_to_sale
+#: model:ir.ui.view,arch_db:imputations_to_sale.sale_order_view_tree
+msgid "Total Pendent to Invoice"
+msgstr "Total Pendiente por Facturar"
+
+#. module: imputations_to_sale
+#: model:ir.model.fields,field_description:imputations_to_sale.field_sale_order_pendent_to_invoice
+msgid "Pendent to invoice"
+msgstr "Pendiente por facturar"
