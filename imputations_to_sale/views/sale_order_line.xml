@@ -51,4 +51,8 @@
         </field>
     </record>
 
+    <record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+        <field name="view_id" ref="imputations_to_sale.sale_order_view_tree"/>
+    </record>
+
 </odoo>
