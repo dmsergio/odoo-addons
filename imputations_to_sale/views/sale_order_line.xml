@@ -28,6 +28,15 @@
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="global_price"/>
             </xpath>
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="pendent_to_invoice" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       attrs="{'invisible': [
+                       '|', '|',
+                       ('invoice_status', '!=', 'to invoice'),
+                       ('s_type', '!=', 'cliente'),
+                       ('state', '!=', 'done')
+                       ]}"/>
+            </xpath>
         </field>
     </record>
 
