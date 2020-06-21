@@ -24,3 +24,13 @@ msgstr "Total Pendiente por Facturar"
 #: model:ir.model.fields,field_description:imputations_to_sale.field_sale_order_pendent_to_invoice
 msgid "Pendent to invoice"
 msgstr "Pendiente por facturar"
+
+#. module: imputations_to_sale
+#: model:ir.model.fields,field_description:imputations_to_sale.field_sale_order_line_fixed_price
+msgid "Fixed price"
+msgstr "Precio fijo"
+
+#. module: imputations_to_sale
+#: model:ir.model.fields,help:imputations_to_sale.field_sale_order_line_fixed_price
+msgid "Check if you do not want to recompute subtotal price."
+msgstr "Márquelo si no quiere recalcular el importe subtotal de la línea."

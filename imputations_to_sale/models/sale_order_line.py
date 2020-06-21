@@ -32,6 +32,10 @@ class SaleOrderLine(models.Model):
         comodel_name='mrp.bom',
         string='Lista de materiales',
     )
+    fixed_price = fields.Boolean(
+        string='Fixed price',
+        help='Check if you do not want to recompute subtotal price.'
+    )
 
     def recalculate_subtotal(self):
         # OPERARIOS
@@ -50,23 +54,29 @@ class SaleOrderLine(models.Model):
         product_ids.append(self.env.ref(
             "imputations_to_sale.product_template_0000_00_0000").\
                            product_variant_id.id)
-
+        Pricelist = self.env['mejisa.product.pricelist']
         for record in self:
-            if record.product_id.id not in product_ids \
-                    and not record.product_id.fixed_price:
+            partner = record.order_id.partner_id
+            if (
+                    record.product_id.id not in product_ids
+                    and not record.fixed_price
+            ):
                 subtotal = record.purchase_price * record.product_uom_qty
-                pricelist_obj = self.env["mejisa.product.pricelist"]
-                pricelist_id = pricelist_obj.search([
-                    ("amount_1", "<=" , subtotal),
-                    ("amount_2", ">=" , subtotal)],limit=1)
-                if pricelist_id:
-                    increase = pricelist_id.increase if not \
-                        record.order_id.partner_id.reduced_rate else \
-                        pricelist_id.decrease
-                    record.price_unit = \
-                        record.purchase_price + (record.purchase_price *
-                                                 increase) / 100
-        return
+                dom = [
+                    ('amount_1', '<=', subtotal),
+                    ('amount_2', '>=', subtotal),
+                ]
+                pricelist = Pricelist.search(dom ,limit=1)
+                if pricelist:
+                    increase = (
+                        partner.reduced_rate and pricelist.decrease or
+                        pricelist.increase
+                    )
+                    record.price_unit = (
+                        record.purchase_price
+                        + (record.purchase_price * increase) / 100
+                    )
+        return True
 
     def get_parent_operator_category(self):
         return self.env["product.category"].browse(769).id

@@ -24,6 +24,7 @@
                 <field name="type_working_day" readonly="1"/>
                 <field name="order_date"/>
                 <field name="sale_line_plant_hours"/>
+                <field name="fixed_price"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="global_price"/>
