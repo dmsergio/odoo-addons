@@ -59,8 +59,9 @@ class SaleOrderLine(models.Model):
             partner = record.order_id.partner_id
             if (
                     record.product_id.id not in product_ids
-                    and not record.fixed_price
-            ):
+                    and not (
+                        record.fixed_price or record.product_id.fixed_price
+            )):
                 subtotal = record.purchase_price * record.product_uom_qty
                 dom = [
                     ('amount_1', '<=', subtotal),
