@@ -28,10 +28,23 @@ class SaleOrder(models.Model):
             'sale.config.settings', 'deposit_product_id_setting'
         )
         for sale in self:
-            lines = sale.order_line.filtered(
+            invoice_lines = sale.order_line.mapped('invoice_lines').filtered(
                 lambda sol: sol.product_id.id == product_id
             )
-            deposit = sum(lines.mapped('price_unit'))
+            deposit = 0.0
+            for line in invoice_lines:
+                currency = (
+                        line.invoice_id and line.invoice_id.currency_id or None
+                )
+                price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+                taxes = line.invoice_line_tax_ids.compute_all(
+                    price,
+                    currency,
+                    line.quantity,
+                    product=line.product_id,
+                    partner=line.invoice_id.partner_id
+                )
+                deposit += taxes.get('total_included')
             pendent_to_invoice = sale.amount_total - deposit
             sale.pendent_to_invoice = pendent_to_invoice
 
