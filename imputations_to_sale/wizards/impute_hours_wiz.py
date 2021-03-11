@@ -214,8 +214,7 @@ class ImputeHoursWiz(models.TransientModel):
         """
         product = self.product_dummy_id.product_variant_id
         self.total_hours = sum(sale_lines.filtered(
-            lambda x: x.operator_product_id.product_variant_id.id ==
-                      product.id).mapped('product_uom_qty'))
+            lambda x: x.product_id.id == product.id).mapped('product_uom_qty'))
         self.subtotal = sum(sale_lines.mapped('price_subtotal'))
         return
 
@@ -226,13 +225,17 @@ class ImputeHoursWiz(models.TransientModel):
         realacionado.
         :return:
         """
-        uom_hour = self.env.ref('product.product_uom_hour')
         if self.sale_id:
             sale_lines = self.sale_id.order_line
             if sale_lines:
+                SaleLine = self.env['sale.order.line']
+                operator_category_ids = SaleLine.get_operator_category()
+                operator_product_ids = self.env["product.template"].search([
+                    ("categ_id", "in", operator_category_ids)]).mapped(
+                    "product_variant_id")
                 sum_hours = sum(sale_lines.filtered(
-                    lambda sl: sl.product_id.uom_id.id == uom_hour.id).mapped(
-                    'product_uom_qty'))
+                    lambda sl: sl.product_id.id in operator_product_ids.ids
+                ).mapped('product_uom_qty'))
                 self.sale_hours = sum_hours
 
     @api.depends('work_order_quantity_ids')
