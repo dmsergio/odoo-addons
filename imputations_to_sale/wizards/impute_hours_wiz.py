@@ -72,14 +72,12 @@ class ImputeHoursWiz(models.TransientModel):
         for work_order_qty in self.work_order_quantity_ids:
             if work_order_qty.product_id.id != manual_product.id:
                 # se crea la línea para la máquina y el operario
-                product = work_order_qty.product_id
-                product_qty = work_order_qty.product_qty
-                price_unit, cost_unit = \
-                    self.get_price(operator_product, product)
-                name = \
-                    ("%s - %s") % (product.display_name, operator_product.name)
-                self.create_sale_order_line(
-                    product, product_qty, price_unit, cost_unit, name)
+                for product in (operator_product + work_order_qty.product_id):
+                    product_qty = work_order_qty.product_qty
+                    price_unit, cost_unit = self.get_price(product)
+                    name = product.display_name
+                    self.create_sale_order_line(
+                        product, product_qty, price_unit, cost_unit, name)
             else:
                 # se crea la línea solo para el operario
                 product_qty = work_order_qty.product_qty
