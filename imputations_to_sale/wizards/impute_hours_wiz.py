@@ -132,23 +132,29 @@ class ImputeHoursWiz(models.TransientModel):
         """
         sale = self.sale_id
         if not sale.partner_id.partner_vip:
-            if self.type_working_day == 'regular':
+            if operator_product_id.categ_id.id != 770:
+                if self.type_working_day == 'regular':
+                    price = operator_product_id.list_price
+                elif self.type_working_day == 'night':
+                    price = operator_product_id.regular_night_price
+                elif self.type_working_day == 'holiday':
+                    price = operator_product_id.regular_holiday_price
+                else:
+                    price = operator_product_id.regular_night_holiday_price
+            else:
                 price = operator_product_id.list_price
-            elif self.type_working_day == 'night':
-                price = operator_product_id.regular_night_price
-            elif self.type_working_day == 'holiday':
-                price = operator_product_id.regular_holiday_price
-            else:
-                price = operator_product_id.regular_night_holiday_price
         else:
-            if self.type_working_day == 'regular':
-                price = operator_product_id.vip_price
-            elif self.type_working_day == 'night':
-                price = operator_product_id.vip_night_price
-            elif self.type_working_day == 'holiday':
-                price = operator_product_id.vip_holiday_price
+            if operator_product_id.categ_id.id != 770:
+                if self.type_working_day == 'regular':
+                    price = operator_product_id.vip_price
+                elif self.type_working_day == 'night':
+                    price = operator_product_id.vip_night_price
+                elif self.type_working_day == 'holiday':
+                    price = operator_product_id.vip_holiday_price
+                else:
+                    price = operator_product_id.vip_night_holiday_price
             else:
-                price = operator_product_id.vip_night_holiday_price
+                price = operator_product_id.vip_price
         if product_id:
             price += \
                 product_id.list_price if not sale.partner_id.partner_vip \
