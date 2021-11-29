@@ -14,8 +14,8 @@ class ImputeHoursWiz(models.TransientModel):
         ondelete='cascade')
     sale_id = fields.Many2one(
         comodel_name='sale.order', string="Pedido de venta",
-        domain="[('state', 'in', ('draft', 'sent')),"
-               "('invoice_status', '!=', 'invoiced')]", ondelete='cascade')
+        domain="[('invoice_status', '!=', 'invoiced')]",
+        ondelete='cascade')
     product_id = fields.Many2one(
         comodel_name='product.template', string="Operario",
         help="Producto operario sobre el que se realizará el registro de "
