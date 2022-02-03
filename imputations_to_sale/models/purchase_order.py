@@ -2,11 +2,10 @@
 # © 2019 Sergio Díaz (<sdimar@yahoo.com>).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models, api, fields
+from odoo import models, api, exceptions, _
 
 
 class PurchaseOrder(models.Model):
-
     _inherit = 'purchase.order'
 
     def _amount_all(self):
@@ -28,7 +27,6 @@ class PurchaseOrder(models.Model):
             for sale in self:
                 sale.add_partner_in_product_supplierinfo()
         return res
-
 
     def add_partner_in_product_supplierinfo(self):
         """
@@ -54,22 +52,26 @@ class PurchaseOrder(models.Model):
             self.update_product_supplier_cost()
         return res
 
-
     def update_product_supplier_cost(self):
         """
         Method to update costs on supplier of products of each purchase order
         line.
         """
-        for line in self.order_line:
-            supplier = line.product_id.seller_ids.filtered(
-                lambda x: x.name.id == self.partner_id.id)
-            if supplier:
-                supplier.write({
-                    'price': line.price_unit,
-                    'discount': line.discount,
-                    'delivery_cost': line.delivery_cost})
-                if not line.no_act:
-                    price = line.price_unit * (
-                            1 - (line.discount / 100)) + line.delivery_cost
-                    line.product_id.write({'standard_price': price})
-        return
+        try:
+            for line in self.order_line:
+                print("Estoy dentro")
+                supplier = line.product_id.seller_ids.filtered(
+                    lambda x: x.name.id == self.partner_id.id)
+                if supplier:
+                    supplier.write({
+                        'price': line.price_unit,
+                        'discount': line.discount,
+                        'delivery_cost': line.delivery_cost})
+                    if not line.no_act:
+                        price = line.price_unit * (
+                                1 - (line.discount / 100)) + line.delivery_cost
+                        line.product_id.write({'standard_price': price})
+        except Exception as e:
+            raise exceptions.ValidationError(e)
+        else:
+            return
