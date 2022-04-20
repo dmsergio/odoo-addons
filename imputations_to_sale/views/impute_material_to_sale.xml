@@ -11,7 +11,7 @@
               <group>
                 <field name="s_title"/>
                 <field name="partner_id"/>
-                <field name="sale_id" options="{'no_create': True}"/>
+                <field name="sale_id" domain="[('state', '=', ('draft','sent'))]" options="{'no_create': True}"/>
                 <field name="product_id"
                        domain="[('type', '=','product')]" options="{'no_create': True}"
                        default_focus="1"/>
