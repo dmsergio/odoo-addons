@@ -21,7 +21,8 @@
                                 <field name="type_working_day"/>
                                 <field name="title" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                                 <field name="partner_id" attrs="{'invisible': [('sale_id', '=', False)]}"/>
-                                <field name="sale_id" domain="[('state', '=', ('draft','sent'))]" options="{'no_create': True}" force_save="1"/>
+                                <field name="sale_id" domain="[('mrp_finish_date', '=', False)]" options="{'no_create': True}" force_save="1"/>
+                                <!--<field name="sale_id" domain="[('state', '=', ('draft','sent'))]" options="{'no_create': True}" force_save="1"/>-->
                             </group>
                             <group>
                                 <field name="vip_customer"/>
